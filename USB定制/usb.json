@@ -1,0 +1,700 @@
+[
+    {
+        "class": 48,
+        "hub_name": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+        "identifiers": {
+            "acpi_path": "\\_SB.PC02.XHCI",
+            "bdf": [
+                128,
+                20,
+                0
+            ],
+            "driver_key": "{36fc9e60-c465-11cf-8056-444553540000}\\0003",
+            "instance_id": "PCI\\VEN_8086&DEV_7F6E&SUBSYS_10641043&REV_10\\3&36CB97A3&0&A0",
+            "location_paths": [
+                "PCIROOT(80)#PCI(1400)",
+                "ACPI(_SB_)#ACPI(PC02)#ACPI(XHCI)"
+            ],
+            "pci_id": [
+                "8086",
+                "7f6e",
+                "1064",
+                "1043"
+            ],
+            "pci_revision": 16
+        },
+        "name": "Intel(R) USB 3.20 \u53ef\u6269\u5c55\u4e3b\u673a\u63a7\u5236\u5668 - 1.20 (Microsoft)",
+        "port_count": 26,
+        "ports": [
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&20839074&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 2
+                },
+                "devices": [
+                    {
+                        "devices": [
+                            {
+                                "devices": [],
+                                "instance_id": "USB\\VID_1908&PID_0226\\6&1A868AE2&1&2",
+                                "name": "USB \u5927\u5bb9\u91cf\u5b58\u50a8\u8bbe\u5907",
+                                "speed": 2
+                            },
+                            {
+                                "devices": [],
+                                "instance_id": "USB\\VID_17EF&PID_38AC\\31097737XB15106286",
+                                "name": "SG Flash",
+                                "speed": 2
+                            }
+                        ],
+                        "instance_id": "USB\\VID_214B&PID_7250\\5&132824EE&0&1",
+                        "name": "USB2.0 HUB",
+                        "speed": 2
+                    },
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_152D&PID_0583\\MSFT300123456789ABC",
+                        "name": "NVME USB3.2",
+                        "speed": 2
+                    }
+                ],
+                "guessed": 9,
+                "index": 1,
+                "name": "Port 1",
+                "selected": true,
+                "selection_index": 1,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": true,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 19
+                },
+                "devices": [],
+                "guessed": 3,
+                "index": 2,
+                "name": "Port 2",
+                "selected": true,
+                "selection_index": 2,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 3,
+                "name": "Port 3",
+                "selected": false,
+                "selection_index": 3,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 4,
+                "name": "Port 4",
+                "selected": false,
+                "selection_index": 4,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 18
+                },
+                "devices": [
+                    {
+                        "devices": [
+                            {
+                                "devices": [],
+                                "instance_id": "USB\\VID_1908&PID_0226\\6&B3A9255&1&2",
+                                "name": "USB \u5927\u5bb9\u91cf\u5b58\u50a8\u8bbe\u5907",
+                                "speed": 2
+                            },
+                            {
+                                "devices": [],
+                                "instance_id": "USB\\VID_17EF&PID_38AC\\31097737XB15106286",
+                                "name": "SG Flash",
+                                "speed": 2
+                            }
+                        ],
+                        "instance_id": "USB\\VID_214B&PID_7250\\5&132824EE&0&5",
+                        "name": "USB2.0 HUB",
+                        "speed": 2
+                    },
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_152D&PID_0583\\MSFT300123456789ABC",
+                        "name": "NVME USB3.2",
+                        "speed": 2
+                    }
+                ],
+                "guessed": 3,
+                "index": 5,
+                "name": "Port 5",
+                "selected": true,
+                "selection_index": 5,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 20
+                },
+                "devices": [],
+                "guessed": 3,
+                "index": 6,
+                "name": "Port 6",
+                "selected": true,
+                "selection_index": 6,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 21
+                },
+                "devices": [],
+                "guessed": 3,
+                "index": 7,
+                "name": "Port 7",
+                "selected": true,
+                "selection_index": 7,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_3277&PID_0096\\200901010001",
+                        "name": "ASUS FHD webcam",
+                        "speed": 2
+                    }
+                ],
+                "guessed": 255,
+                "index": 8,
+                "name": "Port 8",
+                "selected": true,
+                "selection_index": 8,
+                "status": "DeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 9,
+                "name": "Port 9",
+                "selected": false,
+                "selection_index": 9,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 10,
+                "name": "Port 10",
+                "selected": false,
+                "selection_index": 10,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 11,
+                "name": "Port 11",
+                "selected": false,
+                "selection_index": 11,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 12,
+                "name": "Port 12",
+                "selected": false,
+                "selection_index": 12,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 13,
+                "name": "Port 13",
+                "selected": false,
+                "selection_index": 13,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_8087&PID_0032\\5&132824EE&0&14",
+                        "name": "\u82f1\u7279\u5c14(R) \u65e0\u7ebf Bluetooth(R)",
+                        "speed": 1
+                    }
+                ],
+                "guessed": 255,
+                "index": 14,
+                "name": "Port 14",
+                "selected": true,
+                "selection_index": 14,
+                "status": "DeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 0,
+                "index": 15,
+                "name": "Port 15",
+                "selected": false,
+                "selection_index": 15,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 0,
+                "index": 16,
+                "name": "Port 16",
+                "selected": false,
+                "selection_index": 16,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 17,
+                "name": "Port 17",
+                "selected": false,
+                "selection_index": 17,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 5
+                },
+                "devices": [],
+                "guessed": 3,
+                "index": 18,
+                "name": "Port 18",
+                "selected": true,
+                "selection_index": 18,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 2
+                },
+                "devices": [
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_17EF&PID_38AC\\31097737XB15106286",
+                        "name": "SG Flash",
+                        "speed": 3
+                    }
+                ],
+                "guessed": 3,
+                "index": 19,
+                "name": "Port 19",
+                "selected": true,
+                "selection_index": 19,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 6
+                },
+                "devices": [
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_17EF&PID_38AC\\31097737XB15106286",
+                        "name": "SG Flash",
+                        "speed": 3
+                    }
+                ],
+                "guessed": 3,
+                "index": 20,
+                "name": "Port 20",
+                "selected": true,
+                "selection_index": 20,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 7
+                },
+                "devices": [
+                    {
+                        "devices": [],
+                        "instance_id": "USB\\VID_17EF&PID_38AC\\31097737XB15106286",
+                        "name": "SG Flash",
+                        "speed": 3
+                    }
+                ],
+                "guessed": 3,
+                "index": 21,
+                "name": "Port 21",
+                "selected": true,
+                "selection_index": 21,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 22,
+                "name": "Port 22",
+                "selected": false,
+                "selection_index": 22,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 23,
+                "name": "Port 23",
+                "selected": false,
+                "selection_index": 23,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 24,
+                "name": "Port 24",
+                "selected": false,
+                "selection_index": 24,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 25,
+                "name": "Port 25",
+                "selected": false,
+                "selection_index": 25,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 26,
+                "name": "Port 26",
+                "selected": false,
+                "selection_index": 26,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            }
+        ],
+        "selected_count": 11
+    },
+    {
+        "class": 48,
+        "hub_name": "USB#ROOT_HUB30#4&20839074&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+        "identifiers": {
+            "acpi_path": "\\_SB.PC00.TXHC",
+            "bdf": [
+                0,
+                13,
+                0
+            ],
+            "driver_key": "{36fc9e60-c465-11cf-8056-444553540000}\\0001",
+            "instance_id": "PCI\\VEN_8086&DEV_7EC0&SUBSYS_201F1043&REV_10\\3&11583659&0&68",
+            "location_paths": [
+                "PCIROOT(0)#PCI(0D00)",
+                "ACPI(_SB_)#ACPI(PC00)#ACPI(TXHC)"
+            ],
+            "pci_id": [
+                "8086",
+                "7ec0",
+                "201f",
+                "1043"
+            ],
+            "pci_revision": 16
+        },
+        "name": "Intel(R) USB 3.20 \u53ef\u6269\u5c55\u4e3b\u673a\u63a7\u5236\u5668 - 1.20 (Microsoft)",
+        "port_count": 3,
+        "ports": [
+            {
+                "class": 2,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 1,
+                "name": "Port 1",
+                "selected": false,
+                "selection_index": 27,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "USB#ROOT_HUB30#4&d97f90f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}",
+                    "multiple_companions": false,
+                    "port": 1
+                },
+                "devices": [],
+                "guessed": 9,
+                "index": 2,
+                "name": "Port 2",
+                "selected": true,
+                "selection_index": 28,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": true,
+                "user_connectable": true
+            },
+            {
+                "class": 3,
+                "comment": null,
+                "companion_info": {
+                    "hub": "",
+                    "multiple_companions": false,
+                    "port": 0
+                },
+                "devices": [],
+                "guessed": 255,
+                "index": 3,
+                "name": "Port 3",
+                "selected": false,
+                "selection_index": 29,
+                "status": "NoDeviceConnected",
+                "type": null,
+                "type_c": false,
+                "user_connectable": false
+            }
+        ],
+        "selected_count": 1
+    }
+]
