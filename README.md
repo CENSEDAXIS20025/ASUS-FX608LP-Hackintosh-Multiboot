@@ -443,6 +443,44 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 
 ---
 
+## 十二、声明与致谢
+
+### 本仓库由 `deepseek-flash` 上传
+
+| 环节 | 执行者 |
+|---|---|
+| 教程原文、EFI 配置、驱动调通、BIOS 设置、实机验证 | **作者本人**（过程中用 AI 辅助排查） |
+| 仓库归档、README 整理与补充、FAQ 筛选、外部链接核实与标注、上传 | **`deepseek-flash`**（DeepSeek Harness 智能体） |
+| macOS 下的 NVIDIA 驱动 | **nullmoth / 1401**（转载，非本仓库产物） |
+
+> 说明：**技术内容来自作者的实际操作**，AI 负责的是把它整理成可读文档、核对链接、把 EFI 归档。
+> AI 没有在真机上跑过这套流程，**教程的正确性以作者的实测为准**。
+
+### 外部引用链接
+
+以下内容均来自外部，**版权归各自作者所有，本仓库只收录链接、不转载正文**：
+
+| 类别 | 来源 | 用途 |
+|---|---|---|
+| 排查手册 | [黑苹果屋 · OC 各种卡速查表](https://imacos.top/2021/01/19/0154/) | 按报错原文查解决方案 |
+| 排查手册 | [黑苹果星球 · OpenCore 卡住拯救手册 Q&A](https://heipg.cn/tutorial/opencore-install-errors-handbook.html) | 系统性排查 |
+| 排查手册 | [CSDN · 详细教程](https://blog.csdn.net/gitblog_00456/article/details/155172793) | 第三方博客（收录时站点返回 521） |
+| 显卡驱动 | [nullmoth/nvidia-macos-driver](https://github.com/nullmoth/nvidia-macos-driver) · [nullmoth/1401](https://github.com/nullmoth/1401) | macOS 下的 NVIDIA 驱动 |
+| 引导器与工具 | [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg) · [OCAT](https://github.com/ic005k/OCAuxiliaryTools) · [RapidEFI](https://github.com/JeoJay127/RapidEFI-Tool) · [USBToolBox](https://github.com/USBToolBox/tool) | OpenCore 生态 |
+| 系统与工具 | [Ubuntu](https://ubuntu.com/download/desktop) · [balenaEtcher](https://etcher.balena.io/) · [DiskGenius](https://www.diskgenius.com/) · [EasyUEFI](https://www.easyuefi.com/) | 安装介质 / 分区 / 引导项 |
+| Kext 源码 | [Acidanthera](https://github.com/acidanthera) · [OpenIntelWireless](https://github.com/OpenIntelWireless) · [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C) · [Mieze/RTL8111](https://github.com/Mieze/RTL8111_driver_for_OS_X) · [USBToolBox/kext](https://github.com/USBToolBox/kext) · [CpuTopologyRebuild](https://github.com/b00t0x/CpuTopologyRebuild) | 内核驱动 |
+| 参考资料 | [Dortania OpenCore Install Guide](https://dortania.github.io/OpenCore-Install-Guide/) | 黑苹果权威教程 |
+
+**如果以上任何链接的内容侵犯了你的权益，请在 Issues 中提出，我会立即移除。**
+
+### 版权小结
+
+- 系统、软件、驱动、kext 的版权均归**各自作者**所有
+- 本仓库**不含** macOS 安装镜像，也不含 Apple 的任何受版权保护文件
+- `EFI/`、`USB定制/` 与教程文字为作者整理，可自由参考，**但请自行承担使用风险**
+
+---
+
 ## 最后再说一次
 
 1. **显卡驱动是 nullmoth / 1401 的，我只是转载记录**，版权归原作者
