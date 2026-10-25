@@ -1,0 +1,98 @@
+Ubuntu26.04LTS（Intel新平台）
+1.下载系统ISO镜像
+
+2.使用balenaEtcher烧录系统到U盘
+
+3.硬盘分区，使用PE中的DiskGenius
+
+4.BIOS关闭安全启动和IntelRST，以及WindowsBitLocker
+
+5.Windows中查看硬盘控制器类型，是否为AHCI，是否开启VMD，使用agent查看即可
+
+6.Windows下关闭VMD（Intel新平台）防止BIOS修改造成蓝屏，备份注册表，然后按下面教程修改：
+https://ubuntu.com/desktop/docs/en/26.04/how-to/reconfigure-windows-to-use-ahci/
+注意：教程中没有提到NVME硬盘的修改，HKLM\SYSTEM\CurrentControlSet\Services\stornvme同样要修改！然后必须进入安全模式强制切换一次驱动！
+
+7.进入安全模式前在BIOS中关闭VMD或切换硬盘控制器为AHCI，重启系统验证，是否变为标准XXX控制器
+
+8.BIOS启动安装盘，进入Ubuntu安装，记住不要勾选有关在线下载的内容
+注意：如果电脑没有集成显卡，就在启动界面选择第二项safe boot
+
+9.Ubuntu分区：找到你划分的空闲空间，选中，点击左下角“+”号，挂载点选择“/”，之后选择引导加载分区所在硬盘位置，然后安装即可
+注意：不推荐EFI分区与WindowsEFI分区共存！
+
+10.继续完成设置
+
+双系统时间同步问题：
+Windows下注册表改时间同步模式为UTC：reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
+
+
+
+
+
+MacOS黑苹果15.7安装（天选6Pro笔记本平台）：
+1.开启独显直连
+
+2.下载RapidEFI制作工具，构建机型EFI
+注意：一定要人工复核！！
+屏蔽核显！！
+
+3.使用balenaEtcher烧录dmg镜像到U盘
+
+4.使用DiskGenius将生成的EFI文件替换烧录U盘的EFI
+
+5.检查BIOS设置：关闭安全启动，关闭VT-d，开启ResizableBAR，开启Above 4G
+
+6.从U盘启动，进入OC界面选择install macos
+如果卡住，就问agent，按要求修改
+
+7.跑码过程中出现的一切问题，拍照与AI协商解决，注意，vt-d（卡eb）和USB定制（乱码+禁止符号）为失败高发因素
+
+8.进入系统，选择磁盘工具，选择安装macos的磁盘，右键选择抹掉，新建为APFS格式
+
+9.退出选择安装MacOS15，选择安装盘，多次重启选择macos installer，直到进入MacOS
+注意：中途跑码卡住则是EFI问题，重新配置EFI
+一定要选择U盘启动！
+
+
+
+驱动安装以及定制教程：
+1.Mac环境下打开OCAT
+
+2.挂在ESP，进入NVRAM选项，将7C开头的项目中的csr-active-config，改为430A0000
+boot-args改为nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0nv_disable=1-wegnoegpu
+UEFI→Quirks：ResizeGpuBars改为13
+Booster→Quirks：ResizeAppleGpuBars改为-1
+Kernel→Block：新增com.apple.iokit.IONDRVSupport，Strategy设置为Exclude，启用
+Misc→Security→确认SecureBootModel为Disabled
+
+3.下载1401离线驱动：https://github.com/nullmoth/nvidia-macos-driver
+打开终端，依次运行：cd （拖拽文件进终端，去掉文件名，保留路径后回车）
+tar -xzf nullmoth-nvidia-*.tar.gz && cd pkgroot
+shasum -a 256 -c SHA256SUMS
+sudo ./install.sh
+在系统设置中同意隐私设置
+sudo shutdown -r now
+
+
+
+引导设置：
+1.下载并运行EasyUEFI，确保已经复制过EFI文件到ESP分区
+
+2.管理EFI设置，新建，然后选择ESP分区，系统选择Linux及其他
+
+3.文件路径选择EFI\BOOT\bootx64.efi
+
+4.保存后进入BIOS或直接在软件内调整引导顺序即可
+
+其他有关OC的问题，可以使用linux系统使用agent询问并修复
+
+
+
+
+还原U盘：
+命令提示符管理员：
+diskpart
+list disk
+select disk 2
+clean
