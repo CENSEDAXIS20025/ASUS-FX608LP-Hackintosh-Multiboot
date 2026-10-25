@@ -1,7 +1,7 @@
 # EFI 说明
 
 这是**实际调通并人工复核过**的 OpenCore EFI，对应：
-**ASUS TUF Gaming F16（FX608LP）/ 华硕天选6 Pro** · Intel Core Ultra 9 275HX + RTX 5070 Laptop。
+**ASUS FX608LP**（华硕天选6 Pro）· Intel Core Ultra 9 275HX + RTX 5070 Laptop。
 
 > ⚠️ **只适配上面这一台机器。** 换机器请重新按 RapidEFI + 人工复核的流程来，不要直接套用。
 
