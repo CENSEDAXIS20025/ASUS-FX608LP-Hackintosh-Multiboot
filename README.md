@@ -1,6 +1,6 @@
-# 天选6pro 黑苹果等多系统安装案例
+# ASUS FX608LP（天选6 Pro）黑苹果等多系统安装案例
 
-华硕天选6 Pro（ASUS TUF Gaming F16 / **FX608LP**）上跑 **macOS 15.7.8 黑苹果 + Ubuntu 26.04 LTS + Windows** 多系统共存的完整安装记录，含可直接取用的 OpenCore EFI。
+**ASUS FX608LP**（华硕天选6 Pro）上跑 **macOS 15.7.8 黑苹果 + Ubuntu 26.04 LTS + Windows** 多系统共存的完整安装记录，含可直接取用的 OpenCore EFI。
 
 **本仓库只记录我这一台机器上实际跑通的过程。** 换一台机器，绝大多数东西都要重新调。
 
@@ -42,7 +42,7 @@ macOS 下的 NVIDIA 驱动来自开源项目 **1401 / nullmoth**：
 
 | 部件 | 型号 | macOS 下状态 |
 |---|---|---|
-| 整机 | **ASUS TUF Gaming F16（FX608LP）** / 华硕天选6 Pro | — |
+| 整机 | **ASUS FX608LP**（华硕天选6 Pro） | — |
 | CPU | **Intel Core Ultra 9 275HX**（Arrow Lake-HX，24 核 8P+16E，无超线程） | ✅ 需 CPUID 伪装 + CpuTopologyRebuild |
 | 核显 | Intel Graphics（`8086:7D67`，Xe-LPG，Arrow Lake-H/HX） | ❌ macOS 无驱动，**已屏蔽** |
 | 独显 | **NVIDIA GeForce RTX 5070 Laptop**（GB206，`10DE:2D58`，支持 MUX 独显直连） | ⚠️ 靠 1401 驱动 |
@@ -226,18 +226,26 @@ BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
 
 下载：<https://github.com/nullmoth/nvidia-macos-driver>
 
-打开终端，逐条运行：
+> **下载后不要手动解压**（不要用解压软件双击它），下面的 `tar` 命令会自己解开。
+
+打开「终端」，按顺序做三步：
 
 ```bash
-cd （把解压后的目录拖进终端，去掉文件名，保留路径，回车）
+# ① 把下载好的 nullmoth-nvidia-*.tar.gz 拖进终端窗口，
+#    然后删掉末尾的文件名，只保留它所在的目录路径，回车
+cd /拖进来的目录路径/
+
+# ② 解包并进入 pkgroot（校验和安装都在这一层做）
 tar -xzf nullmoth-nvidia-*.tar.gz && cd pkgroot
+
+# ③ 先校验完整性，再安装
 shasum -a 256 -c SHA256SUMS
 sudo ./install.sh
 ```
 
-然后：
+装完之后：
 
-1. 在 **系统设置** 里同意隐私/安全弹窗
+1. 在 **系统设置** 里同意隐私 / 安全弹窗
 2. `sudo shutdown -r now` 重启
 
 > ⚠️ 驱动来自开源项目，**仅支持 macOS 15 Sequoia**（15.x），且要求 Secure Boot 关闭 / SIP 已降级。
@@ -359,56 +367,40 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 - 用 **USBToolBox** 重新定制：<https://github.com/USBToolBox/tool>
 - 或在 BIOS 里临时把 `XHCI Hand-off` 打开应急
 
-### 卡在 `Still waiting for root device`
+### 跑码卡住 / 装完反复重启
 
-找不到启动盘。常见原因：NVMe 没驱动、USB 口用了不支持的控制器、`SecureBootModel` 没关。
-
-### 装完重启进不了系统 / 反复重启
-
-- 每次重启都要**从 U 盘启动**，选 `macOS Installer` 继续
-- 装完第一次进桌面之前，不要拔 U 盘
-
-### 独显不亮 / 黑屏
-
-按顺序检查：
-
-1. BIOS 里**独显直连**开了吗
-2. `ResizeGpuBars=13`、`ResizeAppleGpuBars=-1` 设了吗
-3. Kernel Block 里 `IONDRVSupport` 加了吗
-4. `SecureBootModel=Disabled` 了吗
-5. 1401 驱动装了吗、装完重启了吗
-
-### 屏幕分辨率不对（没有 2560×1600）
-
-`ResizeGpuBars` 没设成 `13`，或者 `ResizeAppleGpuBars` 不是 `-1`。
+- **跑码卡住 = EFI 问题**，回去重新配 EFI
+- 安装过程会**多次重启**，每次都要从 **U 盘启动**，选 `macOS Installer` 继续
+- 装完第一次进桌面之前，**不要拔 U 盘**
 
 ### 改了 BIOS 之后 Windows 蓝屏 `INACCESSIBLE_BOOT_DEVICE`
 
-**VMD / RST 模式变了。** 回 BIOS 改回来，或按「一、第 6 步」改注册表后进安全模式切换。
+**VMD / RST 模式变了。** 回 BIOS 把硬盘控制器改回来，
+或按「一、第 6 步」改注册表后进安全模式切换。
 
 ### 切系统时间差 8 小时
 
-见上面「六、双系统时间同步」。
+见「六、双系统时间同步」。
 
-### Wi-Fi 打不开
-
-- 确认 `AirportItlwm` 是**启用**的、`itlwm` 是**关闭**的（两个不能同时开）
-- AirportItlwm 版本要和 macOS 版本对应（15.x 要用对应版本）
-- AX210 在部分 macOS 版本下还需要配合 `itlwm` + **HeliPort** 客户端：
-  <https://github.com/OpenIntelWireless/HeliPort>
-
-### 声卡没声音
-
-`boot-args` 里的 `alcid=` 编号不对。ALC256 常用 `13`，也可以试 `11`、`21`、`69`，逐个试。
-
-### 睡眠 / 唤醒异常
-
-先用 `pmset -g log` 看唤醒原因；常见是 USB 设备唤醒或 `Hibernatemode` 设置问题。
-可以先把「显示器睡眠」关掉，只留「系统睡眠」逐个排查。
+> 上面四条是我这次实际踩到的。其它报错的详细排查，见下面「九、延伸阅读」。
 
 ---
 
-## 九、用到的软件与驱动（官网）
+## 九、延伸阅读（详细教程）
+
+这三份是我自己查得最多的，内容比本文细得多。**遇到本文没写到的报错，先去这里找。**
+
+| 来源 | 内容 |
+|---|---|
+| [黑苹果屋 · OpenCore 引导各种卡 & 常见问题速查表合集](https://imacos.top/2021/01/19/0154/) | **按报错原文分类的速查表**：`OCB: StartImage failed`、`OCABC: Memory pool allocation failure`、`apfs_module_start`、禁止符号、黑屏、卡 EB…… 一条条给解决方案。适合拿着屏幕上的报错直接搜。 |
+| [黑苹果星球 · OpenCore 安装卡住的拯救手册 Q&A](https://heipg.cn/tutorial/opencore-install-errors-handbook.html) | **Q&A 式的系统排查手册**：从「新手常见错误」到「启动界面 / 代码界面」再到「其他」，写清了每个 config.plist 选项该填什么、每个 Quirk 是干什么的。适合系统性地过一遍。 |
+| [CSDN · 相关详细教程](https://blog.csdn.net/gitblog_00456/article/details/155172793) | 第三方博客上的详细教程（收录时站点返回 521 打不开，链接照原样保留，稍后再试）。 |
+
+> 三份都是**外部资料**，内容与版权归原作者所有，本仓库只收录链接、不转载正文。
+
+---
+
+## 十、用到的软件与驱动（官网）
 
 | 软件 | 用途 | 官方地址 |
 |---|---|---|
@@ -439,7 +431,7 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 
 ---
 
-## 十、目录说明
+## 十一、目录说明
 
 | 路径 | 内容 |
 |---|---|
@@ -454,7 +446,7 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 ## 最后再说一次
 
 1. **显卡驱动是 nullmoth / 1401 的，我只是转载记录**，版权归原作者
-2. **EFI 只适配 ASUS TUF Gaming FX608LP 这一台机器**
+2. **EFI 只适配 ASUS FX608LP 这一台机器**
 3. **SMBIOS 序列号请自己生成**，不要照抄
 4. 黑苹果有风险，**先备份**
 5. macOS 是 Apple 的版权软件，本仓库不含任何系统文件
