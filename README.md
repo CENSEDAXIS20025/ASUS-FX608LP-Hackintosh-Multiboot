@@ -7,6 +7,9 @@
 > 📅 记录时间：2026 年 10 月
 > 💻 测试系统：macOS **15.7.8**（Sequoia）· Ubuntu **26.04 LTS** · Windows 11
 
+> 📌 **仓库里的 `EFI/` 对应 macOS 15（Sequoia）。**
+> 升级到 macOS 26（Tahoe）要重新定制 **USB / 网卡 / 声卡** —— 见「[十二、macOS 26 迁移记录](#十二macos-26tahoe迁移记录)」。
+
 ---
 
 ## ⚠️ 重要声明（务必先读）
@@ -150,11 +153,15 @@ BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
 
 | 项 | 设置 |
 |---|---|
-| Secure Boot | **关闭** |
+| **Intel 可信执行技术（Intel TXT）** | **先关闭** ← 天选的 VT-d 被 TXT 锁着，不先关它 VT-d 关不掉 |
+| Secure Boot | **关闭**（直接关「安全启动控制」，重进 BIOS 会看到 Secure Boot 已自动变成关闭） |
 | VT-d | **关闭**（不关会卡 EB） |
 | Resizable BAR | **开启** |
 | Above 4G Decoding | **开启** |
 | 独显直连 | **开启** |
+
+> 📌 **天选这台的正确顺序：关「安全启动控制」→ 关「Intel TXT」→ 关 VT-d。**
+> 顺序错了 VT-d 会灰着改不了。
 
 ### 6. 从 U 盘启动
 
@@ -299,6 +306,11 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeI
 
 ## 七、EFI 说明
 
+> ⚠️ **这份 `EFI/` 只适用于 macOS 15（Sequoia）。**
+> macOS 26（Tahoe）改了不少底层的东西 —— USB 端口属性名变了、`AppleHDA.kext` 被移除、无线驱动要换 Tahoe 构建，
+> **必须重新定制 USB / 网卡 / 声卡**。我后来在 macOS 26 上的完整踩坑记录见
+> 「[十二、macOS 26（Tahoe）迁移记录](#十二macos-26tahoe迁移记录)」。
+
 ### 目录结构
 
 ```
@@ -359,6 +371,10 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 ### 卡在 `EB`（`EB.WL.PWLFNV` 之类）
 
 **VT-d 没关。** 进 BIOS 关掉 VT-d（或 `VT for Directed I/O`），这是最高发的原因。
+
+> ⚠️ **天选6 Pro 上关不掉 VT-d？先关「Intel 可信执行技术（Intel TXT）」。**
+> 这台机器的 VT-d 被 TXT 锁着，正确顺序是：**关「安全启动控制」→ 关 Intel TXT → 关 VT-d**。
+> 关掉「安全启动控制」后重进 BIOS，Secure Boot 会自己变成关闭状态。
 
 ### 乱码 + 禁止符号 🚫
 
@@ -443,7 +459,136 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 
 ---
 
-## 十二、声明与致谢
+## 十二、macOS 26（Tahoe）迁移记录
+
+> 这一节是**升级到 macOS 26 之后**的排障记录。
+> **上面的 `EFI/` 是 macOS 15 的**，到 macOS 26 有几处必须重做。
+
+### 12.1 USB 全部失效 —— 属性名改了
+
+Tahoe 把 USB 端口的属性名从 **`UsbConnector` / `port`** 改成了 **`usb-port-type` / `usb-port-number`**。
+
+**做法**：在 `USBMap.kext` 的每个端口里**同时保留旧键、新增新键**，并加 `kUSBMuxEnabled = true`。
+我这台 12 个端口这样改完，USB 恢复。
+
+### 12.2 无线（Intel AX210）—— 换 Tahoe 构建
+
+原来的 `AirportItlwm 2.4.0` 是 **Sequoia 构建**，Tahoe 加载不了。
+
+**做法**：换成 Tahoe 构建 **`AirportItlwm-Tahoe-v2.4.0-RELEASE-alpha`**（`tahoe-vtd-1`），
+并在 `boot-args` 里加 **`itlwm_he=1`**。
+
+- 项目地址：<https://github.com/laobamac/itlwm>
+
+### 12.3 音频（Realtek ALC256）—— AppleHDA 被移除了
+
+**macOS 26 移除了 `AppleHDA.kext`**，所以 AppleALC 没有后端可用。
+
+**做法**：装 **`SimpleHDA-Tahoe-v1.0.0-RELEASE`**，在 `Kernel → Add` 里排在 `AppleALC` **之后**，
+`MinKernel = 25.0.0` / `MaxKernel = 25.99.99`。
+
+- 项目地址：<https://github.com/laobamac/SimpleHDA>
+
+### 12.4 OpenCore 从 DEBUG 换回 RELEASE（不再跑码）
+
+- 从 `boot-args` 移除 **`-v`**
+- OpenCore **1.0.9 DEBUG → 1.0.9 RELEASE**（Dortania 构建）
+- 替换 `OpenCore.efi`、`BOOTx64.efi` 及 `OpenRuntime / OpenCanopy / ResetNvramEntry / OpenLinuxBoot`
+- `Misc → Debug → Target = 0`、`DisplayLevel = 0`、`AppleDebug = false`
+
+### 12.5 OC 里的 Ubuntu 引导项 —— 相对路径不行
+
+自定义 Ubuntu 项用相对路径会报 `OCB: LoadImage failed - Not Found`。
+
+**做法**：改成**完整 UEFI 设备路径**：
+
+```
+PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\EFI\ubuntu\shimx64.efi
+```
+
+两个坑：
+
+- `PciRoot` 是 **`0x1`**，不是常见的 `0x0`
+- NVMe 的 EUI64 在 UEFI 里写作 `XX-XX-XX-XX-XX-XX-XX-XX`，
+  和 Linux `sysfs` 里的 `XX-XX-XX-XX-XX-XX-XX-XX` **正好反序**
+
+### 12.6 睡眠「睡死」
+
+**关键前提：这台的显示输出走 NVIDIA，所以不能禁 N 卡**（`-wegnoegpu` 加上会没显示，**已撤回**）。
+
+先调电源策略（`hibernatemode 0`、`standby 0`、`autopoweroff 0`、`powernap 0`、
+`womp 0`、`proximitywake 0`、`acwake 0`）—— 脚本见 `macos26/scripts/fix-sleep-pmset.sh`。
+如果还睡死，用 `diagnose-sleep.sh` 收集日志，再考虑 `HibernationFixup` / `USBWakeFixup`。
+
+### 12.7 触控板（ELAN `04F3:32E2`，I2C-HID）—— **尚未解决**
+
+- `LegionI2CArrowLake.kext` 只是个 `Info.plist` 注入项，声明了 `IOClass = VoodooI2CPCILakeController`
+- 但 VoodooI2C **2.9.1 里没有这个类**，所以触控板起不来
+- 试过改成 `VoodooI2CPCIController`：无效，**已撤回**
+- 需要**补丁版 VoodooI2C**（自己编译，或先凑合 USB 鼠标）
+
+排查脚本：`macos26/scripts/find-voodooi2c.sh`（在 macOS 里跑，找有没有带 `LakeController` 的版本）
+
+### 12.8 macOS 26 下的关键配置
+
+| 项 | 值 |
+|---|---|
+| OpenCore | **1.0.9 RELEASE**（Dortania build-repo，`OpenCorePkg-78d5ff8`）|
+| SMBIOS | `MacBookPro16,1` |
+| `csr-active-config` | `0A43`（SIP 关闭）|
+| `SecureBootModel` | `Disabled` |
+| `DisableIoMapper` | `true` |
+| `Misc → Boot → Timeout` | `5` |
+| `Misc → Debug → Target` | `0` |
+| `Misc → Entries` | Ubuntu 项启用，Path 用完整设备路径 |
+| `Kernel → Add` 末尾 | `SimpleHDA.kext`（25.0.0–25.99.99）|
+| 已禁用 | `itlwm` · `UTBDefault` · `SMCSuperIO` |
+
+**`boot-args`（macOS 26 当前）**：
+
+```
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
+```
+
+> 注意：**没有 `-v`**（不再跑码），**没有 `-wegnoegpu`**（不能禁 N 卡）。
+
+### 12.9 驱动版本（macOS 26）
+
+| 组件 | 版本 |
+|---|---|
+| Lilu | 1.7.3 |
+| VirtualSMC / SMC 插件 | 1.3.9 |
+| WhateverGreen | 1.7.2 |
+| AppleALC | 1.9.9 |
+| SimpleHDA | 1.0.0 |
+| NVMeFix | 1.1.4 |
+| RestrictEvents | 1.1.7 |
+| AMFIPass | 1.4.1 |
+| AirportItlwm | 2.4.0（Tahoe 构建）|
+| itlwm | 2.3.0（禁用）|
+| IntelBluetoothFirmware / IntelBTPatcher | 2.5.0 |
+| BlueToolFixup | 2.7.3 |
+| VoodooI2C | 2.9.1（官方，缺 `VoodooI2CPCILakeController`）|
+| VoodooPS2Controller | 2.3.8 |
+| USBMap / USBToolBox | 1.1（已改 Tahoe 键）/ 1.2.0 |
+| LegionI2CArrowLake | 1.1.0 |
+
+### 12.10 相关素材
+
+| 路径 | 内容 |
+|---|---|
+| `macos26/README.md` | 这次迁移的**完整原始报告** |
+| `macos26/evidence/` | 取证材料 13 份：`lspci` · `lsblk` · `efibootmgr` · `kexts` · `config-diff` · `mont` … |
+| `macos26/scripts/` | `fix-sleep-pmset.sh` · `diagnose-sleep.sh` · `find-voodooi2c.sh` |
+| `macos26/config.plist` | macOS 26 下的当前配置（供对照）|
+| `macos26/session/` | 本次会话的模型 I/O 日志（`.jsonl.gz`）|
+
+> ⚠️ **升级前务必保留 macOS 15 版本的 EFI**（就是仓库里的 `EFI/`），
+> 否则万一 macOS 26 起不来，没有回滚的路。
+
+---
+
+## 十三、声明与致谢
 
 ### 本仓库由 `deepseek-flash` 上传
 
