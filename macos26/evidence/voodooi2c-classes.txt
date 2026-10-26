@@ -1,0 +1,3 @@
+VoodooI2CPCIController
+VoodooI2CPCIControllerC
+VoodooI2CPCIControllerD

@@ -1,0 +1,12 @@
+--- /proc/asound/card0/codec#0
+Codec: Nvidia GPU ad HDMI/DP
+Vendor Id: 0x10de00ad
+Subsystem Id: 0x10de0000
+--- /proc/asound/card1/codec#0
+Codec: Realtek ALC256
+Vendor Id: 0x10ec0256
+Subsystem Id: 0x10431064
+--- /proc/asound/card1/codec#2
+Codec: Intel Meteor Lake HDMI
+Vendor Id: 0x8086281d
+Subsystem Id: 0x80860101

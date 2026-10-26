@@ -1,0 +1,31 @@
+NAME          SIZE FSTYPE   LABEL        PARTUUID                             MOUNTPOINTS
+loop0           4K squashfs                                                   /snap/bare/5
+loop1          20M squashfs                                                   /snap/desktop-security-center/151
+loop2        66.8M squashfs                                                   /snap/core24/1643
+loop3       260.3M squashfs                                                   /snap/firefox/8763
+loop4        14.2M squashfs                                                   /snap/desktop-security-center/206
+loop5        16.5M squashfs                                                   /snap/firmware-updater/226
+loop6        91.7M squashfs                                                   /snap/gtk-common-themes/1535
+loop7       614.5M squashfs                                                   /snap/gnome-46-2404/164
+loop8         1.5M squashfs                                                   /snap/hwctl/123
+loop9         1.5M squashfs                                                   /snap/hwctl/131
+loop10        402M squashfs                                                   /snap/mesa-2404/1839
+loop11       18.8M squashfs                                                   /snap/prompting-client/222
+loop12       18.4M squashfs                                                   /snap/prompting-client/228
+loop13       50.1M squashfs                                                   /snap/snapd/27710
+loop14       11.8M squashfs                                                   /snap/snap-store/1390
+loop15        828K squashfs                                                   /snap/snapd-desktop-integration/391
+nvme0n1     953.9G                                                            
+├─nvme0n1p1   260M vfat     SYSTEM       12b598d2-052e-4c22-a7eb-567523e46726 
+├─nvme0n1p2    16M                       befa88fd-fc27-47c8-af7b-d266acd63b12 
+├─nvme0n1p3 359.3G ntfs     Windows11    aa6119ad-2d46-4ad0-938c-99d4138c845d 
+├─nvme0n1p4   1.1G ntfs                  2eff6e2f-1538-420a-8434-2427da003691 
+├─nvme0n1p5   564G ntfs     软件和文件盘 3e971dd6-9443-4a63-8e09-05a10526bdaf /run/media/zhangyuanhui/软件和文件盘
+├─nvme0n1p6    28G ntfs     RESTORE      41831fe9-2392-4238-8cba-ad57036b571d 
+└─nvme0n1p7   260M vfat     MYASUS       c15dee86-9ece-4fc2-aa07-3b7f6749a8c9 
+nvme1n1       1.8T                                                            
+├─nvme1n1p1    16M                       821ff08b-3bb5-46a8-9981-44b27ea2cb7a 
+├─nvme1n1p2   1.6T ntfs     游戏盘       62bd5e49-e3f4-4383-989d-3212653f73e7 
+├─nvme1n1p3  96.3G ext4                  31296000-c00a-4b68-aa41-7ec933f7dbf8 /
+├─nvme1n1p4     1G vfat                  xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx /boot/efi
+└─nvme1n1p5 105.6G apfs                  075ab00b-1a4b-42e2-981d-d659f9a948b1 

@@ -1,0 +1,1 @@
+VoodooI2CPCIArrowLakePCHController IOClass= VoodooI2CPCILakeController IOPCIMatch= 0x7f4c8086&0xFFFCFFFF

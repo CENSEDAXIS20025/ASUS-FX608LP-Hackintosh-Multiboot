@@ -1,0 +1,36 @@
+ 0 ON  Lilu.kext                                     1.7.3        min= max= arch=Any
+ 1 ON  AMFIPass.kext                                 1.4.1        min=20.0.0 max= arch=Any
+ 2 ON  AppleALC.kext                                 1.9.9        min= max= arch=Any
+ 3 ON  AppleMCEReporterDisabler.kext                 1.2          min= max= arch=Any
+ 4 ON  BlueToolFixup.kext                            2.7.3        min=21.0.0 max= arch=Any
+ 5 ON  BrightnessKeys.kext                           1.0.4        min= max= arch=Any
+ 6 ON  CpuTopologyRebuild.kext                       2.0.2        min= max= arch=Any
+ 7 ON  CpuTscSync.kext                               1.1.3        min= max= arch=Any
+ 8 ON  IntelBTPatcher.kext                           2.5.0        min= max= arch=Any
+ 9 ON  IntelBluetoothFirmware.kext                   2.5.0        min= max= arch=Any
+10 ON  VoodooI2C.kext/Contents/PlugIns/VoodooI2CServices.kext 1.0          min= max= arch=Any
+11 ON  VoodooI2C.kext/Contents/PlugIns/VoodooGPIO.kext 1.1          min= max= arch=Any
+12 ON  VoodooI2C.kext                                2.9.1        min= max= arch=Any
+13 ON  LegionI2CArrowLake.kext                       1.1.0        min= max= arch=Any
+14 ON  NVMeFix.kext                                  1.1.4        min=18.0.0 max= arch=Any
+15 ON  RealtekRTL8111.kext                           2.4.2        min= max= arch=Any
+16 ON  RestrictEvents.kext                           1.1.7        min= max= arch=Any
+17 ON  VirtualSMC.kext                               1.3.9        min= max= arch=Any
+18 ON  SMCBatteryManager.kext                        1.3.9        min= max= arch=Any
+19 ON  SMCLightSensor.kext                           1.3.9        min= max= arch=Any
+20 ON  SMCProcessor.kext                             1.3.9        min= max= arch=Any
+21 off SMCSuperIO.kext                               1.3.9        min= max= arch=Any
+22 ON  USBToolBox.kext                               1.2.0        min= max= arch=Any
+23 ON  USBMap.kext                                   1.1          min= max= arch=Any
+24 off UTBDefault.kext                               1.0          min= max= arch=Any
+25 ON  VoodooI2C.kext/Contents/PlugIns/VoodooInput.kext 1.1.7        min= max= arch=Any
+26 ON  VoodooI2CHID.kext                             1.0          min= max= arch=Any
+27 ON  VoodooPS2Controller.kext                      2.3.8        min= max= arch=Any
+28 off VoodooPS2Controller.kext/Contents/PlugIns/VoodooInput.kext 1.1.7        min= max= arch=Any
+29 ON  VoodooPS2Controller.kext/Contents/PlugIns/VoodooPS2Keyboard.kext 2.3.8        min= max= arch=Any
+30 ON  VoodooPS2Controller.kext/Contents/PlugIns/VoodooPS2Mouse.kext 2.3.8        min= max= arch=Any
+31 ON  VoodooPS2Controller.kext/Contents/PlugIns/VoodooPS2Trackpad.kext 2.3.8        min= max= arch=Any
+32 ON  WhateverGreen.kext                            1.7.2        min= max= arch=Any
+33 off itlwm.kext                                    2.3.0        min= max= arch=Any
+34 ON  AirportItlwm.kext                             2.4.0        min= max= arch=Any
+35 ON  SimpleHDA.kext                                1.0.0        min=25.0.0 max=25.99.99 arch=x86_64

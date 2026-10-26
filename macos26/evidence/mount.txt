@@ -1,0 +1,1 @@
+/dev/nvme1n1p4 vfat xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx /boot/efi

@@ -1,0 +1,40 @@
+boot-args: -vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
+Timeout: 5
+Debug: {
+ "AppleDebug": false,
+ "ApplePanic": false,
+ "DisableWatchDog": false,
+ "DisplayDelay": 0,
+ "DisplayLevel": 0,
+ "LogModules": "*",
+ "SysReport": false,
+ "Target": 0
+}
+Entries: [
+ {
+  "Arguments": "",
+  "Auxiliary": false,
+  "Comment": "Ubuntu",
+  "Enabled": true,
+  "Flavour": "Auto",
+  "Name": "Ubuntu",
+  "Path": "PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\\EFI\\ubuntu\\shimx64.efi",
+  "TextMode": false
+ }
+]
+SimpleHDA: [
+ {
+  "Arch": "x86_64",
+  "BundlePath": "SimpleHDA.kext",
+  "Comment": "SimpleHDA 1.0.0",
+  "Enabled": true,
+  "ExecutablePath": "Contents/MacOS/SimpleHDA",
+  "MaxKernel": "25.99.99",
+  "MinKernel": "25.0.0",
+  "PlistPath": "Contents/Info.plist"
+ }
+]
+SMBIOS: MacBookPro16,1
+SecureBootModel: Disabled
+DisableIoMapper: True
+csr-active-config: b'C\n\x00\x00'

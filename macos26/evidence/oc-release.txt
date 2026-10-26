@@ -1,0 +1,10 @@
+OpenCore.efi: 630784 bytes
+BOOTx64.efi: 24576 bytes
+DEBUG_XCODE5 occurrences: 0
+drivers:
+total 288
+-rwxr-xr-x 1 root root  37892 Oct 25 05:26 HfsPlus.efi
+-rwxr-xr-x 1 root root 114688 Oct 24 04:33 OpenCanopy.efi
+-rwxr-xr-x 1 root root  69632 Oct 24 04:33 OpenLinuxBoot.efi
+-rwxr-xr-x 1 root root  24576 Oct 24 04:33 OpenRuntime.efi
+-rwxr-xr-x 1 root root  45056 Oct 24 04:33 ResetNvramEntry.efi

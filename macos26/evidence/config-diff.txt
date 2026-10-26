@@ -1,0 +1,3 @@
+VAL /NVRAM/Add/7C436110-AB2A-4BBB-A880-FE41995C9F82/boot-args '-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 -v keepsyms=1 alcid=13' -> '-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1'
+VAL /Misc/Entries[0]/Path '\\EFI\\ubuntu\\grubx64.efi' -> 'PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\\EFI\\ubuntu\\shimx64.efi'
+LEN /Kernel/Add 35 36
