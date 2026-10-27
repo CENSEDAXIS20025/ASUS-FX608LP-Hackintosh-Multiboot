@@ -96,6 +96,7 @@ macOS 下的 NVIDIA 驱动来自开源项目 **1401 / nullmoth**：
 | 屏幕 | 2560 × 1600 | ✅ 需 `ResizeGpuBars=13` |
 | 硬盘 | NVMe SSD | ✅ 需 NVMeFix |
 | 电池 | ASUS GU60558 | ✅ SMCBatteryManager |
+| 触控板 | **ELAN `04F3:32E2`**（I2C-HID，I2C 地址 `0x15`） | ✅ **已修复**：补丁版 VoodooI2C + VoodooI2CHID（见 [13.1 触控板](#touchpad)） |
 
 **SMBIOS 机型：`MacBookPro16,1`**（这是为了骗过 macOS 的机型检查，不代表真实硬件）
 
