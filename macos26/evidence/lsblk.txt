@@ -20,7 +20,7 @@ nvme0n1     953.9G
 ├─nvme0n1p2    16M                       befa88fd-fc27-47c8-af7b-d266acd63b12 
 ├─nvme0n1p3 359.3G ntfs     Windows11    aa6119ad-2d46-4ad0-938c-99d4138c845d 
 ├─nvme0n1p4   1.1G ntfs                  2eff6e2f-1538-420a-8434-2427da003691 
-├─nvme0n1p5   564G ntfs     软件和文件盘 3e971dd6-9443-4a63-8e09-05a10526bdaf /run/media/zhangyuanhui/软件和文件盘
+├─nvme0n1p5   564G ntfs     软件和文件盘 3e971dd6-9443-4a63-8e09-05a10526bdaf /run/media/<user>/软件和文件盘
 ├─nvme0n1p6    28G ntfs     RESTORE      41831fe9-2392-4238-8cba-ad57036b571d 
 └─nvme0n1p7   260M vfat     MYASUS       c15dee86-9ece-4fc2-aa07-3b7f6749a8c9 
 nvme1n1       1.8T                                                            
