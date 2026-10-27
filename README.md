@@ -4,6 +4,8 @@
 
 **ASUS FX608LP**（华硕天选 6 Pro）上跑 **macOS 26.7.1 + Ubuntu 26.04 LTS + Windows 11** 多系统共存的实机记录，含可直接取用的 OpenCore EFI、踩坑过程和修复方案。
 
+> **这是我的踩坑记录，希望能帮上大家。**
+
 > 记录时间：2026 年 10 月
 > 当前测试系统：macOS **26.7.1（25G241）** · Ubuntu **26.04 LTS** · Windows 11
 > 机器：Intel Core Ultra 9 275HX · RTX 5070 Laptop · 32 GB · 2560×1600 165 Hz
