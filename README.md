@@ -209,7 +209,7 @@ EFI/OC/Kexts/VoodooI2C.kext.bak-forcedpolling-*
 EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 ```
 
-- 桌面上保留了补丁版副本：`~/Desktop/patched-voodooi2c/`
+- 本机备份目录里保留了补丁版副本：`~/Documents/ASUS-FX608LP-Hackintosh-backup/patched-voodooi2c/`
 - **以后升级 VoodooI2C / VoodooI2CHID，或用别的 EFI 覆盖，这两个补丁会丢失，触控板会再次失效。** 把补丁版覆盖回 `EFI/OC/Kexts` 即可。
 - 该方案依赖 `-vi2c-force-polling`；如果 boot-args 被清掉，需要补回。
 
@@ -452,7 +452,7 @@ defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding
 <a name="backup"></a>
 ### 0.11 备份、恢复与 SMBIOS
 
-- 修改 EFI 前的完整备份：本机 `~/Desktop/EFI-backups/EFI-backup-20261027-221905.zip`
+- 修改 EFI 前的完整备份：本机 `~/Documents/ASUS-FX608LP-Hackintosh-backup/EFI-backups/EFI-backup-20261027-221905.zip`
 - 触控板补丁原版备份：
 
 ```text
@@ -460,8 +460,8 @@ EFI/OC/Kexts/VoodooI2C.kext.bak-forcedpolling-*
 EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 ```
 
-- 触控板补丁版副本：`~/Desktop/patched-voodooi2c/`
-- 恢复说明：`~/Desktop/EFI恢复说明.txt`
+- 触控板补丁版副本：`~/Documents/ASUS-FX608LP-Hackintosh-backup/patched-voodooi2c/`
+- 恢复说明：`~/Documents/ASUS-FX608LP-Hackintosh-backup/EFI恢复说明.txt`
 - SMBIOS：仓库当前文件已使用占位符；**请用 OCAT / GenSMBIOS 生成你自己的 `SystemSerialNumber`、`MLB`、`SystemUUID`、`ROM`**，不要直接开机使用占位符。
 - 2026-10-28 已对当前文件和 git 历史做脱敏，并移除含真实序列号/MLB/UUID 的原始压缩会话日志；如果你在 fork、缓存或旧 commit 里看到旧值，请以最新 `main` 为准。
 - Git 托管方可能仍缓存旧对象；如果对隐私要求高，建议在 GitHub 支持页面请求清理缓存，或重新建一个干净的仓库。
