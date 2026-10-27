@@ -172,11 +172,36 @@ Ubuntu 26.04 LTS Desktop：<https://ubuntu.com/download/desktop>
 BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
 核显在 macOS 下没有驱动，必须屏蔽，否则会黑屏或卡进度条。
 
-### 2. 用 RapidEFI 生成 EFI
+### 2. 生成 EFI：RapidEFI 或 1401
+
+有两条路可以走，**我最后用的是 1401**。
+
+#### 方案 A · RapidEFI
 
 <https://github.com/JeoJay127/RapidEFI-Tool>
 
-选对应机型后生成。**注意：一定要人工复核！** 自动生成的配置不能直接信，尤其是：
+选对应机型后生成，然后自己再烧 macOS 镜像（见第 3 步）。
+
+> ⚠️ **RapidEFI 没有第 15 代（Arrow Lake / Core Ultra 200）处理器的模板** ——
+> 选不到能对得上的机型，这也是我最后没用它的原因。
+
+#### 方案 B · 1401（我实际用的，新平台推荐）
+
+<https://github.com/nullmoth/1401>
+
+Windows 下的**一条龙工具**：检查硬件 → 生成 OpenCore → 下载 macOS → **直接写好安装 U 盘**。
+它基于 [OpCore-Simplify](https://github.com/lzhoang2801/OpCore-Simplify) 再套自己的规则，
+**专门带了 Arrow Lake 的处理**（`arrow-lake-ctr` / `arrow-lake-ctrsmt`），所以第 15 代平台能用。
+
+用法（需要 ≥4 GB 可清空的 U 盘 + 联网）：
+
+1. 解压 release，保持 `1401` 文件夹完整，**以管理员身份运行 `1401.exe`**
+2. 依次点：**Check this PC** → **Build the Mac setup** → 看 **Your BIOS steps** → **Create the macOS stick**
+3. 用 1401 的话，下面第 3、4 步可以跳过 —— U 盘和 EFI 它已经一起写好了，直接去第 5 步改 BIOS
+
+#### 无论用哪个：一定要人工复核！
+
+自动生成的配置不能直接信，重点检查：
 
 - **屏蔽核显**（`-wegnoegpu` 或设备属性里禁用 iGPU）
 - CPUID 伪装（Arrow Lake 需要）
@@ -184,13 +209,17 @@ BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
 
 > 本仓库 `EFI/` 里就是我**复核并调通之后**的成品，可以直接对比。
 
-### 3. 烧录 macOS 镜像
+### 3. 烧录 macOS 镜像（用 RapidEFI 才需要）
 
 用 **balenaEtcher** 把 dmg 烧到 U 盘（镜像自行获取）。
 
-### 4. 替换 U 盘 EFI
+> 用 1401 生成的 U 盘自带 macOS 安装器，**这一步可以跳过**。
+
+### 4. 替换 U 盘 EFI（用 RapidEFI 才需要）
 
 用 **DiskGenius** 打开 U 盘的 EFI 分区，用第 2 步生成的 EFI 替换掉原有的。
+
+> 1401 会连 EFI 一起写进去，**不用手动替换**。
 
 ### 5. BIOS 检查
 
