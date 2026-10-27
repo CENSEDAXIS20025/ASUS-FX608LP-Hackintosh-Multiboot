@@ -1,0 +1,18 @@
+# ---- 语言统计规则 ----
+#
+# 这个仓库是「EFI 配置 + 二进制驱动 + 文档」的档案，本身几乎没有源码。
+# 不做处理的话，语言条会被一条 551 KB 的 ACPI 转储（DSDT.aml）撑成
+# "ASL 92.9% / Shell 7.1%"，完全看不出实际情况。
+#
+# 所以：
+#   · EFI/   全部是第三方产物（Acidanthera 的 kext、OpenCore、Ubuntu 的 shim）
+#            —— 按 vendor 处理，不计入统计
+#   · *.aml  是从本机固件 dump 出来的 ACPI，不是手写代码 —— 按 generated 处理
+#   · *.dsl  是随 kext 附带的源码 —— 按 vendor 处理
+#
+# 处理之后，语言条只反映仓库自己的可执行代码：macos26/scripts/*.sh
+# 想还原成 GitHub 的原始统计，删掉这个文件即可。
+
+/EFI/**    linguist-vendored
+*.aml      linguist-generated
+*.dsl      linguist-vendored
