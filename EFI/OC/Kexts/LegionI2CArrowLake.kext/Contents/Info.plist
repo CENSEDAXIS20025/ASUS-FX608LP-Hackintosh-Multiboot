@@ -35,7 +35,7 @@
 			<key>I2CSdaHoldTimeNs</key>
 			<integer>42</integer>
 			<key>IOClass</key>
-			<string>VoodooI2CPCILakeController</string>
+			<string>VoodooI2CPCIController</string>
 			<key>IOPCIMatch</key>
 			<string>0x7f4c8086&amp;0xFFFCFFFF</string>
 			<key>IOProbeScore</key>
