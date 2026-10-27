@@ -1158,15 +1158,15 @@
 				<key>Auxiliary</key>
 				<false/>
 				<key>Comment</key>
-				<string>Ubuntu</string>
+				<string>Ubuntu (disabled; add your own ESP/partition path)</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>Flavour</key>
 				<string>Auto</string>
 				<key>Name</key>
 				<string>Ubuntu</string>
 				<key>Path</key>
-				<string>PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\EFI\ubuntu\shimx64.efi</string>
+				<string>PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0x0,0x0)/\EFI\ubuntu\shimx64.efi</string>
 				<key>TextMode</key>
 				<false/>
 			</dict>
@@ -1362,7 +1362,7 @@
 			<integer>3841</integer>
 			<key>ROM</key>
 			<data>
-			ZmZmZmZm
+			AAAAAAAA
 			</data>
 			<key>SpoofVendor</key>
 			<true/>

@@ -46,6 +46,8 @@
 **输入**：`VoodooI2C`（+`VoodooGPIO` / `VoodooI2CServices` / `VoodooInput`）· `VoodooI2CHID` ·
 `VoodooPS2Controller`（+`Keyboard` / `Mouse` / `Trackpad`）
 
+> 触控板已使用补丁版 `VoodooI2C` / `VoodooI2CHID`（强制 Polling + 定时器），详见根目录 README「0.1 触控板」。
+
 **USB**：`USBToolBox` · `USBMap`
 
 **CPU / 其它**：`CpuTscSync` · `CpuTopologyRebuild` · `AMFIPass` · `AppleMCEReporterDisabler` ·
@@ -56,12 +58,11 @@
 
 ## 使用前必做
 
-1. **重新生成 SMBIOS 序列号** —— 在 OCAT 里点「生成」，或换一套你自己的
-   （`SystemSerialNumber` / `MLB` / `SystemUUID` / `ROM`）。
+1. **重新生成 SMBIOS** —— 仓库里的 `SystemSerialNumber` / `MLB` / `SystemUUID` / `ROM`
+   已替换为占位符。请在 OCAT / GenSMBIOS 里生成一套你自己的，不要直接使用占位符；
    多台机器共用同一套会导致 iCloud / iMessage 被锁。
 2. **改 BIOS**：关 Secure Boot、关 VT-d、开 Resizable BAR、开 Above 4G、开独显直连。
-3. **确认 macOS 版本**：这套配置在 **macOS 15.7.8（Sequoia）** 上验证；
-   1401 显卡驱动只支持 macOS 15.x，升到 26 就失效。
+3. **确认 macOS 版本**：这份 `EFI/` 原始配置对应 **macOS 15.7.8**；macOS 26 的当前配置、1401 2.6.2 和触控板补丁见根目录 README 第十二节 / 0.1。
 4. 先在小容量 U 盘上试，别一上来就动主硬盘。
 
 ## 关于备份文件

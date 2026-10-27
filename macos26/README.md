@@ -41,32 +41,29 @@
 - 安装 `SimpleHDA-Tahoe-v1.0.0-RELEASE`（SHA256 校验通过），`Kernel > Add` 排在 AppleALC 后，`MinKernel=25.0.0` / `MaxKernel=25.99.99`；加 `keepsyms=1`。
 - 状态：已安装，**待重启验证**；`SimpleHDA-HAL-1.0.0.pkg` 未装。
 
-### 1.5 触控板（ELAN 04F3:32E2，I2C-HID）
-- 硬件：ELAN 04F3:32E2，ACPI `ASCE1200`，`compatible=PNP0C50`，I2C 控制器 `8086:7F4F`。
-- 根因：`LegionI2CArrowLake.kext` 是仅含 Info.plist 的注入项，声明 `IOClass=VoodooI2CPCILakeController`，但 VoodooI2C 2.9.1 **没有这个类**。
-- 尝试过：改为 `VoodooI2CPCIController`，无效；**已撤回**，恢复原始自定义类（等待补丁版 VoodooI2C）。
-- 本地共享盘、Windows、旧 EFI 克隆都没有找到补丁版；APFS 数据卷 FileVault 锁定，系统卷 sealed，Linux 只读工具读不到。
-- 需在 macOS 里运行 `scripts/find-voodooi2c.sh`；若找到 `PATCHED FOUND`，把该 `VoodooI2C.kext` 复制到本文件夹，我再替换。
+### 1.5 触控板（ELAN 04F3:32E2，I2C-HID）—— 已解决
+
+2026-10-28 已解决。根因是 VoodooI2C 优先走 APIC、忽略 `-vi2c-force-polling`，以及 VoodooI2CHID 在 Polling 下仍然使用不会触发的事件源。完整补丁见根目录 README 的「0.1 触控板」。
 
 ### 1.6 开机跑码 / OC DEBUG
 - `-v` 已从 `boot-args` 移除。
 - OpenCore 从 1.0.9 DEBUG 换成 1.0.9 RELEASE（Dortania 构建），替换 `OpenCore.efi`、`BOOTx64.efi`、`OpenRuntime/OpenCanopy/ResetNvramEntry/OpenLinuxBoot` 驱动；配置/kexts/Resources 保留。
 - 状态：已安装，**待重启验证**；OC 阶段应不再闪代码。
 
-### 1.7 睡眠“睡死”
-- 用户确认显示由 **NVIDIA** 驱动，**不能禁用 N 卡**；`-wegnoegpu` 已加入后立即撤回，当前 `boot-args` 中没有它。
-- 已提供 `scripts/fix-sleep-pmset.sh`（`hibernatemode 0`、`standby 0`、`autopoweroff 0`、`powernap 0`、`womp 0`、`proximitywake 0`、`acwake 0`）。
-- 状态：**待用户在 macOS 中运行并重启测试**；如果仍睡死，运行 `scripts/diagnose-sleep.sh` 收集日志，再决定 `HibernationFixup`/`USBWakeFixup`/WiFi/音频调整。
+### 1.7 睡眠“睡死”—— 已解决
+
+2026-10-28 定位到 `sleepimage` 只有 1 GB（内存 32 GB）且 `/var/vm` 未指向 VM 卷。修复：`pmset -a hibernatemode 0 standby 0 autopoweroff 0 powernap 0`，并重建 `/private/var/vm -> /System/Volumes/VM`。睡眠/唤醒已验证正常。详见根目录 README「0.3 睡眠」。
 
 ## 2. 当前关键配置
 
 - `Misc > Boot > Timeout = 5`
-- `Misc > Debug > Target = 0`，`DisplayLevel = 0`，`AppleDebug=false`
-- `Misc > Entries`：Ubuntu 项启用，Path 为完整设备路径
+- `Misc > Debug > Target = 67`，`AppleDebug=true`、`ApplePanic=true`（1401 要求的失败日志）
+- `Misc > Entries`：Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径
 - `Kernel > Add` 末尾：`SimpleHDA.kext`（x86_64，25.0.0–25.99.99，启用）
+- `Kernel > Add`：`AsusSMC.kext` 1.4.1（测试 Fn/背光；`IsKeyboardBacklightSupported=No`）
 - `itlwm.kext` 禁用；`UTBDefault.kext` 禁用；`SMCSuperIO.kext` 禁用
 - 当前 `boot-args`：
-  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1`
+  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm`
 - **没有** `-wegnoegpu`；N 卡未被禁用。
 
 ## 3. 驱动版本
@@ -85,10 +82,12 @@
 | itlwm | 2.3.0（禁用） |
 | IntelBluetoothFirmware / IntelBTPatcher | 2.5.0 |
 | BlueToolFixup | 2.7.3 |
-| VoodooI2C | 2.9.1（官方，缺 `VoodooI2CPCILakeController`） |
+| VoodooI2C | 2.9.1（已打 force-polling 补丁） |
+| VoodooI2CHID | 1（已打 Polling 定时器补丁） |
+| AsusSMC | 1.4.1（键盘背光不支持） |
 | VoodooPS2Controller | 2.3.8 |
 | USBMap / USBToolBox | 1.1（已改 Tahoe 键）/ 1.2.0 |
-| LegionI2CArrowLake | 1.1.0（IOClass 已恢复为 `VoodooI2CPCILakeController`） |
+| LegionI2CArrowLake | 1.1.0（IOClass 改为 `VoodooI2CPCIController`） |
 
 ## 4. 备份与回滚
 
@@ -113,19 +112,21 @@ sudo cp EFI/OC-DEBUG-BACKUP-20261027-010130/Drivers/*.efi /boot/efi/EFI/OC/Drive
 
 （在 Ubuntu 里把 `EFI/...` 换成 `/boot/efi/EFI/...`。）
 
-## 5. 待验证/下一步
+## 5. 当前状态 / 未解决
 
-1. 重启验证：OC 不再跑码；WiFi/音频是否恢复；触控板是否仍无效。
-2. 睡眠：在 macOS 运行 `scripts/fix-sleep-pmset.sh`，重启测试；仍睡死则运行 `scripts/diagnose-sleep.sh > ~/Desktop/sleep-log.txt` 并反馈。
-3. 触控板：在 macOS 运行 `scripts/find-voodooi2c.sh`；若输出 `PATCHED FOUND`，复制该 kext 到本文件夹。
-4. 若找不到补丁版 VoodooI2C：需要编译（Xcode）或先用 USB 鼠标。
-5. WiFi 若未加载：`kextstat | grep -i airportitlwm`；Tahoe 版有报告要求 SIP 开启（当前 SIP 关闭）。
-6. 音频若无声：试 ALC256 其他 layout（11/21/56/66/69/99），再考虑 `SimpleHDA-HAL`。
+- ✅ 触控板：已解决（补丁版 VoodooI2C + VoodooI2CHID）
+- ✅ 睡眠：已解决（hibernatemode 0 + /var/vm + DisableRtcChecksum）
+- ✅ 1401 EFI 4 项：已改
+- ❌ 键盘背光：AsusSMC 报 `IsKeyboardBacklightSupported=No`
+- ❌ Fn+F10 触控板开关：2025 Fn 层没有进入 AsusSMC
+- ❌ 网页滚动破碎：首选试 `-nvrmnoflip`，未最终解决
+- ❌ 1600×1000 / 1707×1067 HiDPI：驱动未暴露，建议 BetterDisplay
+- ⚠️ 风扇噪音：dGPU 直连内屏的结构性原因
 
 ## 6. 文件夹内容
 
 - `README.md`：本报告
-- `session/`：本次会话原始模型 I/O（JSONL）及当日 CLI/APP 日志
+- `session/`：原始会话日志含真实序列号/MLB/UUID，**已于 2026-10-28 移除**
 - `EFI/`：ESP `EFI` 目录完整快照（OC、BOOT、ubuntu、OC-DEBUG-BACKUP）
 - `artifacts/config/`：当前 config 和全部配置备份
 - `artifacts/kext-info-backups/`：USBMap、LegionI2C 的 Info.plist 备份
