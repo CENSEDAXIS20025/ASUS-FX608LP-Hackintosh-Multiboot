@@ -43,7 +43,7 @@
 
 ### 1.5 触控板（ELAN 04F3:32E2，I2C-HID）—— 已解决
 
-2026-10-28 已解决。根因是 VoodooI2C 优先走 APIC、忽略 `-vi2c-force-polling`，以及 VoodooI2CHID 在 Polling 下仍然使用不会触发的事件源。完整补丁见根目录 README 的「0.1 触控板」。
+2026-10-28 已解决。根因是 VoodooI2C 优先走 APIC、忽略 `-vi2c-force-polling`，以及 VoodooI2CHID 在 Polling 下仍然使用不会触发的事件源。完整补丁见根目录 README 的「13.1 触控板」。
 
 ### 1.6 开机跑码 / OC DEBUG
 - `-v` 已从 `boot-args` 移除。
@@ -52,7 +52,7 @@
 
 ### 1.7 睡眠“睡死”—— 已解决
 
-2026-10-28 定位到 `sleepimage` 只有 1 GB（内存 32 GB）且 `/var/vm` 未指向 VM 卷。修复：`pmset -a hibernatemode 0 standby 0 autopoweroff 0 powernap 0`，并重建 `/private/var/vm -> /System/Volumes/VM`。睡眠/唤醒已验证正常。详见根目录 README「0.3 睡眠」。
+2026-10-28 定位到 `sleepimage` 只有 1 GB（内存 32 GB）且 `/var/vm` 未指向 VM 卷。修复：`pmset -a hibernatemode 0 standby 0 autopoweroff 0 powernap 0`，并重建 `/private/var/vm -> /System/Volumes/VM`。睡眠/唤醒已验证正常。详见根目录 README「13.3 睡眠」。
 
 ## 2. 当前关键配置
 

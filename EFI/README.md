@@ -46,7 +46,7 @@
 **输入**：`VoodooI2C`（+`VoodooGPIO` / `VoodooI2CServices` / `VoodooInput`）· `VoodooI2CHID` ·
 `VoodooPS2Controller`（+`Keyboard` / `Mouse` / `Trackpad`）
 
-> 触控板已使用补丁版 `VoodooI2C` / `VoodooI2CHID`（强制 Polling + 定时器），详见根目录 README「0.1 触控板」。
+> 触控板已使用补丁版 `VoodooI2C` / `VoodooI2CHID`（强制 Polling + 定时器），详见根目录 README「13.1 触控板」。
 
 **USB**：`USBToolBox` · `USBMap`
 

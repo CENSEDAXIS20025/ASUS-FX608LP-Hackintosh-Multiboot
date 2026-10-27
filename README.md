@@ -1,3 +1,5 @@
+> 本文由 deepseek-flash 上传。
+
 # ASUS FX608LP（天选 6 Pro）黑苹果多系统安装与维护记录
 
 **ASUS FX608LP**（华硕天选 6 Pro）上跑 **macOS 26.7.1 + Ubuntu 26.04 LTS + Windows 11** 多系统共存的实机记录，含可直接取用的 OpenCore EFI、踩坑过程和修复方案。
@@ -12,43 +14,645 @@
 
 > **SMBIOS 声明**：仓库里的 `SystemSerialNumber`、`MLB`、`SystemUUID`、`ROM` 已全部替换为占位符（`XXXXXXXXXXXX` / `XXXXXXXXXXXXXXXXX` / 全 0 UUID / 全 0 ROM）。**请务必用 OCAT、GenSMBIOS 或 OpenCore Configurator 生成一套你自己的序列号**，不要直接使用占位符，也不要多台机器共用同一套，否则 iCloud / iMessage 可能被锁。2026-10-28 已对当前文件和 git 历史做过脱敏；如果你在 fork、缓存或旧 commit 里看到旧值，请以本仓库最新 `main` 为准。
 
----
-
 ## 目录
 
-- [零、2026-10-28 本次维护与修复总览](#maintenance)
-  - [0.1 触控板（重点，已解决）](#touchpad)
-  - [0.2 1401 EFI 检查 4 项](#efi-checks)
-  - [0.3 睡眠 / 休眠（已解决）](#sleep)
-  - [0.4 键盘、Fn、AsusSMC、键盘背光、Fn+F10](#keyboard)
-  - [0.5 风扇与功耗](#fan)
-  - [0.6 显示缩放 / HiDPI](#scaling)
-  - [0.7 网页滚动破碎 / 渲染异常](#render)
-  - [0.8 maclator 部署与使用](#maclator)
-  - [0.9 菜单栏图标间距](#menubar)
-  - [0.10 当前状态：已解决 / 未解决](#status)
-  - [0.11 备份、恢复与 SMBIOS](#backup)
-- 原有安装指南
-  - 一、Windows + Ubuntu 26.04 LTS
-  - 二、macOS 15.7.8 黑苹果
-  - 三、驱动安装与定制（NVIDIA）
-  - 四、引导设置
-  - 五、还原 U 盘
-  - 六、双系统时间同步
-  - 七、EFI 说明
-  - 八、常见问题 FAQ
-  - 九、延伸阅读
-  - 十、用到的软件与驱动
-  - 十一、目录说明
-  - 十二、macOS 26（Tahoe）迁移记录
-  - 十三、声明与致谢 / 外部引用链接
+**系统安装**
+
+- [一、Windows + Ubuntu 26.04 LTS（Intel 新平台）](#sec1)
+- [二、macOS 15.7.8 黑苹果](#sec2)
+- [三、驱动安装与定制（NVIDIA 独显）](#sec3)
+- [四、引导设置（让 EFI 出现在 BIOS 启动项里）](#sec4)
+- [五、还原 U 盘](#sec5)
+- [六、双系统时间同步](#sec6)
+- [七、EFI 说明](#sec7)
+- [八、常见问题 FAQ](#sec8)
+- [九、延伸阅读（详细教程）](#sec9)
+- [十、用到的软件与驱动（官网）](#sec10)
+- [十一、目录说明](#sec11)
+- [十二、macOS 26（Tahoe）迁移记录](#sec12)
+
+**安装后的维护与修复**
+
+- [十三、安装后的维护与修复（2026-10-28）](#maintenance)
+  - [13.1 触控板（重点，已解决）](#touchpad)
+  - [13.2 1401 EFI 检查 4 项](#efi-checks)
+  - [13.3 睡眠 / 休眠（已解决）](#sleep)
+  - [13.4 键盘、Fn、AsusSMC、键盘背光、Fn+F10](#keyboard)
+  - [13.5 风扇与功耗](#fan)
+  - [13.6 显示缩放 / HiDPI](#scaling)
+  - [13.7 网页滚动破碎 / 渲染异常](#render)
+  - [13.8 maclator 部署与使用](#maclator)
+  - [13.9 菜单栏图标间距](#menubar)
+  - [13.10 当前状态：已解决 / 未解决](#status)
+  - [13.11 备份、恢复与 SMBIOS](#backup)
+
+**声明**
+
+- [十四、声明与致谢 / 外部引用链接](#sec14)
+
+---
+
+## ⚠️ 重要声明（务必先读）
+
+**1. 显卡驱动是转载，不是我写的**
+
+macOS 下的 NVIDIA 驱动来自开源项目 **1401 / nullmoth**：
+
+- 驱动仓库：<https://github.com/nullmoth/nvidia-macos-driver>
+- 1401 项目：<https://github.com/nullmoth/1401>
+
+**本仓库不包含该驱动的任何源码，也没有对它做任何修改**，只是记录「我用它跑通了」这件事并给出安装步骤。驱动的版权、署名、授权全部归原作者 **nullmoth** 及 1401 项目贡献者所有。使用前请到上面两个仓库阅读其许可证与说明。
+
+**2. 只在我的硬件上验证过**
+
+下面的 EFI、ACPI、USB 定制、SMBIOS 全部是为这一台机器调的。**别的机器直接用大概率开不了机**，最坏情况会清掉你的引导项。请把它当作「参考案例」，而不是「通用 EFI」。
+
+**3. 风险自负**
+
+黑苹果需要关闭 Secure Boot、修改 SIP、打内核补丁、屏蔽核显。可能造成：数据丢失、系统无法启动、Windows 蓝屏、失去保修、iCloud/iMessage 账号异常。**请先备份，重要数据不要只存一份。**
+
+**4. 不含任何 Apple 受版权保护的内容**
+
+仓库里没有 macOS 安装镜像、没有 Apple 的驱动文件。系统镜像请自行通过 Apple 官方渠道获取。
+
+**5. SMBIOS 已脱敏，请自己生成**
+
+仓库里的 `SystemSerialNumber`、`MLB`、`SystemUUID`、`ROM` 已替换为占位符（`XXXXXXXXXXXX` / `XXXXXXXXXXXXXXXXX` / 全 0 UUID / 全 0 ROM）。**请务必用 OCAT、GenSMBIOS 或 OpenCore Configurator 重新生成一套你自己的**，不要直接使用占位符，也不要多台机器共用同一套 —— 会导致 iCloud / iMessage 被锁。2026-10-28 已对当前文件和 git 历史做脱敏；如果你在 fork、缓存或旧 commit 里看到旧值，请以最新 `main` 为准。
+
+---
+
+## 硬件信息
+
+| 部件 | 型号 | macOS 下状态 |
+|---|---|---|
+| 整机 | **ASUS FX608LP**（华硕天选6 Pro） | — |
+| CPU | **Intel Core Ultra 9 275HX**（Arrow Lake-HX，24 核 8P+16E，无超线程） | ✅ 需 CPUID 伪装 + CpuTopologyRebuild |
+| 核显 | Intel Graphics（`8086:7D67`，Xe-LPG，Arrow Lake-H/HX） | ❌ macOS 无驱动，**已屏蔽** |
+| 独显 | **NVIDIA GeForce RTX 5070 Laptop**（GB206，`10DE:2D58`，支持 MUX 独显直连） | ⚠️ 靠 1401 驱动 |
+| 无线 | Intel Wi-Fi 6E **AX210**（`8086:2725`） | ✅ AirportItlwm |
+| 蓝牙 | Intel 蓝牙（走 USB） | ✅ IntelBluetoothFirmware + BlueToolFixup |
+| 声卡 | Realtek **ALC256** | ✅ AppleALC（`alcid=13`） |
+| 有线网卡 | Realtek **RTL8168** | ✅ RealtekRTL8111 |
+| 屏幕 | 2560 × 1600 | ✅ 需 `ResizeGpuBars=13` |
+| 硬盘 | NVMe SSD | ✅ 需 NVMeFix |
+| 电池 | ASUS GU60558 | ✅ SMCBatteryManager |
+
+**SMBIOS 机型：`MacBookPro16,1`**（这是为了骗过 macOS 的机型检查，不代表真实硬件）
+
+---
+
+<a name="sec1"></a>
+## 一、Windows + Ubuntu 26.04 LTS（Intel 新平台）
+
+> 顺序建议：**先装 Windows，再装 Ubuntu**。装完 Windows 再动分区，引导关系更清楚。
+
+### 1. 下载系统镜像
+
+Ubuntu 26.04 LTS Desktop：<https://ubuntu.com/download/desktop>
+
+### 2. 烧录到 U 盘
+
+用 **balenaEtcher**：<https://etcher.balena.io/>
+
+### 3. 硬盘分区
+
+进 PE，用 **DiskGenius**：<https://www.diskgenius.com/>
+
+给 Ubuntu 留出未分配空间（建议 ≥ 80 GB）。
+
+### 4. BIOS 设置
+
+- 关闭 **Secure Boot**
+- 关闭 **Intel RST**（或在 RAID 模式下切到 AHCI）
+- 关闭 **Windows BitLocker**（控制面板 → 设备加密）
+
+### 5. 确认硬盘控制器类型
+
+在 Windows 里看硬盘控制器是不是 **AHCI**、有没有开 **VMD**。
+
+### 6. ⚠️ 关闭 VMD（Intel 新平台必做，否则改 BIOS 会蓝屏）
+
+**先备份注册表**，然后按 Ubuntu 官方教程改：
+
+<https://ubuntu.com/desktop/docs/en/26.04/how-to/reconfigure-windows-to-use-ahci/>
+
+> **官方教程漏了 NVMe！** 除了教程里写的 `stornvme`，NVMe 硬盘还要改
+> `HKLM\SYSTEM\CurrentControlSet\Services\stornvme` 下的 `StartOverride`。
+> 改完**必须进一次安全模式**强制切换驱动，否则重启直接蓝屏。
+
+### 7. 进安全模式验证
+
+进安全模式前，先在 BIOS 里关闭 **VMD**（或把硬盘控制器切成 **AHCI**），
+重启后确认设备管理器里已经变成「标准 NVM Express 控制器」。
+
+### 8. 从 U 盘启动，安装 Ubuntu
+
+- **不要勾选任何「在线下载」相关的选项**（会卡网络）
+- 如果机器**没有核显**（或核显被禁用），启动界面选第二项 **safe boot**
+
+### 9. 分区
+
+选中你留出的空闲空间 → 点左下角 **「+」**：
+
+- 挂载点选 **`/`**
+- 引导加载器安装位置选**这块硬盘**
+
+> **不推荐**把 Ubuntu 的 EFI 分区和 Windows 的 EFI 分区合并共存，容易把 Windows 引导搞坏。
+
+### 10. 完成设置
+
+---
+
+<a name="sec2"></a>
+## 二、macOS 15.7.8 黑苹果
+
+### 1. 开启独显直连
+
+BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
+核显在 macOS 下没有驱动，必须屏蔽，否则会黑屏或卡进度条。
+
+### 2. 用 RapidEFI 生成 EFI
+
+<https://github.com/JeoJay127/RapidEFI-Tool>
+
+选对应机型后生成。**注意：一定要人工复核！** 自动生成的配置不能直接信，尤其是：
+
+- **屏蔽核显**（`-wegnoegpu` 或设备属性里禁用 iGPU）
+- CPUID 伪装（Arrow Lake 需要）
+- SMBIOS 机型
+
+> 本仓库 `EFI/` 里就是我**复核并调通之后**的成品，可以直接对比。
+
+### 3. 烧录 macOS 镜像
+
+用 **balenaEtcher** 把 dmg 烧到 U 盘（镜像自行获取）。
+
+### 4. 替换 U 盘 EFI
+
+用 **DiskGenius** 打开 U 盘的 EFI 分区，用第 2 步生成的 EFI 替换掉原有的。
+
+### 5. BIOS 检查
+
+| 项 | 设置 |
+|---|---|
+| **Intel 可信执行技术（Intel TXT）** | **先关闭** ← 天选的 VT-d 被 TXT 锁着，不先关它 VT-d 关不掉 |
+| Secure Boot | **关闭**（直接关「安全启动控制」，重进 BIOS 会看到 Secure Boot 已自动变成关闭） |
+| VT-d | **关闭**（不关会卡 EB） |
+| Resizable BAR | **开启** |
+| Above 4G Decoding | **开启** |
+| 独显直连 | **开启** |
+
+> 📌 **天选这台的正确顺序：关「安全启动控制」→ 关「Intel TXT」→ 关 VT-d。**
+> 顺序错了 VT-d 会灰着改不了。
+
+### 6. 从 U 盘启动
+
+进 OpenCore 界面 → 选 **Install macOS**。
+
+> **卡住就停下来查，不要反复重试。** 跑码卡住 99% 是 EFI 配置问题。
+
+### 7. 跑码阶段的问题处理
+
+**遇到任何报错，拍照，然后和 AI 一起排查。** 两个最高发的失败点：
+
+- **卡 `EB`** → 几乎都是 **VT-d 没关**
+- **乱码 + 禁止符号（🚫）** → **USB 端口没有定制**（见下面 FAQ）
+
+### 8. 抹盘
+
+进入系统 → **磁盘工具** → 选中要装 macOS 的磁盘 → 右键 **抹掉** → 格式选 **APFS**。
+
+### 9. 安装
+
+退出磁盘工具 → 选 **安装 macOS 15** → 选安装盘 →
+后面会**多次重启**，每次都选 **macOS Installer** 那个启动项，直到进入系统。
+
+> - 中途跑码卡住 = EFI 问题，回去重新配
+> - **每次都要从 U 盘启动**（装好之前硬盘引导还没写好）
+
+---
+
+<a name="sec3"></a>
+## 三、驱动安装与定制（NVIDIA 独显）
+
+这一步是让 **RTX 5070** 在 macOS 下亮起来的关键。
+
+### 1. 打开 OCAT
+
+<https://github.com/ic005k/OCAuxiliaryTools>
+
+挂载 **ESP 分区**，加载 `EFI/OC/config.plist`。
+
+### 2. 改这些项
+
+**NVRAM → 7C436110-AB2A-4BBB-A880-FE41995C9F82**
+
+- `csr-active-config` → `430A0000`
+- `boot-args` →
+
+```
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm -ibtcompatbeta revpatch=sbvmm
+```
+
+**UEFI → Quirks**
+
+- `ResizeGpuBars` → `13`
+
+**Booster → Quirks**
+
+- `ResizeAppleGpuBars` → `-1`
+
+**Kernel → Block**（新增一条）
+
+- `Identifier` = `com.apple.iokit.IONDRVSupport`
+- `Strategy` = `Exclude`
+- 勾选 **Enabled**
+
+**Misc → Security**
+
+- `SecureBootModel` = `Disabled`
+
+### 3. 安装 1401 驱动
+
+下载：<https://github.com/nullmoth/nvidia-macos-driver>
+
+> **下载后不要手动解压**（不要用解压软件双击它），下面的 `tar` 命令会自己解开。
+
+打开「终端」，按顺序做三步：
+
+```bash
+# ① 把下载好的 nullmoth-nvidia-*.tar.gz 拖进终端窗口，
+#    然后删掉末尾的文件名，只保留它所在的目录路径，回车
+cd /拖进来的目录路径/
+
+# ② 解包并进入 pkgroot（校验和安装都在这一层做）
+tar -xzf nullmoth-nvidia-*.tar.gz && cd pkgroot
+
+# ③ 先校验完整性，再安装
+shasum -a 256 -c SHA256SUMS
+sudo ./install.sh
+```
+
+装完之后：
+
+1. 在 **系统设置** 里同意隐私 / 安全弹窗
+2. `sudo shutdown -r now` 重启
+
+> ⚠️ 驱动来自开源项目，**仅支持 macOS 15 Sequoia**（15.x），且要求 Secure Boot 关闭 / SIP 已降级。
+> 版本更新和授权请以作者仓库为准，本仓库不转存、不修改、不分发其任何文件。
+
+---
+
+<a name="sec4"></a>
+## 四、引导设置（让 EFI 出现在 BIOS 启动项里）
+
+### 1. 准备
+
+用 **EasyUEFI**：<https://www.easyuefi.com/>
+
+先确认 EFI 文件已经复制到 **ESP 分区**。
+
+### 2. 添加引导项
+
+1. 打开 EasyUEFI → **管理 EFI 启动项** → **新建**
+2. 选 **ESP 分区**，类型选 **Linux 及其他**
+3. 文件路径填 `EFI\BOOT\bootx64.efi`
+4. 保存，然后在 BIOS 或软件里把它的顺序调到第一位
+
+---
+
+<a name="sec5"></a>
+## 五、还原 U 盘
+
+装完之后把 U 盘还原成普通 U 盘（**会清空整个 U 盘**，先确认盘号！）：
+
+```
+diskpart
+list disk
+select disk 2
+clean
+```
+
+> `select disk 2` 里的 **2 一定要换成你 U 盘的盘号**，选错会清掉你的硬盘。
+
+---
+
+<a name="sec6"></a>
+## 六、双系统时间同步
+
+Windows 默认把 BIOS 时间当本地时间，Linux/macOS 当 UTC，所以切系统会差 8 小时。
+
+**在 Windows 里用管理员权限运行：**
+
+```cmd
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
+```
+
+---
+
+<a name="sec7"></a>
+## 七、EFI 说明
+
+> ⚠️ **这份 `EFI/` 只适用于 macOS 15（Sequoia）。**
+> macOS 26（Tahoe）改了不少底层的东西 —— USB 端口属性名变了、`AppleHDA.kext` 被移除、无线驱动要换 Tahoe 构建，
+> **必须重新定制 USB / 网卡 / 声卡**。我后来在 macOS 26 上的完整踩坑记录见
+> 「[十二、macOS 26（Tahoe）迁移记录](#十二macos-26tahoe迁移记录)」。
+
+### 目录结构
+
+```
+EFI/
+├── BOOT/            BOOTx64.efi · fbx64.efi · mmx64.efi
+├── OC/              OpenCore 主目录
+│   ├── config.plist   ← 核心配置（已调通）
+│   ├── OpenCore.efi
+│   ├── ACPI/          10 个 SSDT + DSDT.aml
+│   ├── Drivers/       HfsPlus · OpenCanopy · OpenLinuxBoot · OpenRuntime · ResetNvramEntry
+│   ├── Kexts/         28 个驱动（见下表）
+│   ├── Resources/     开机菜单的字体、图标、标签
+│   └── Tools/
+└── ubuntu/          Ubuntu 的 shim + grub（多系统引导）
+USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
+```
+
+### 已启用的 kext（28 项）
+
+| kext | 作用 |
+|---|---|
+| Lilu | 几乎所有其它 kext 的基础 |
+| VirtualSMC | 模拟 SMC 芯片（黑苹果必备） |
+| SMCProcessor · SMCLightSensor · SMCBatteryManager | CPU 传感器 · 环境光 · 电池 |
+| WhateverGreen | 显卡通用补丁 |
+| AppleALC | 声卡（`alcid=13`） |
+| AirportItlwm | Intel AX210 无线网卡 |
+| IntelBluetoothFirmware · IntelBTPatcher · BlueToolFixup | Intel 蓝牙 |
+| RealtekRTL8111 | 有线网卡 |
+| NVMeFix | NVMe 电源管理 |
+| USBToolBox · USBMap | USB 端口定制 |
+| VoodooI2C · VoodooI2CHID · VoodooGPIO · VoodooI2CServices | 触摸板（I2C） |
+| VoodooPS2Controller（+Keyboard/Mouse/Trackpad） | 键盘 / 触摸板回退 |
+| CpuTscSync · CpuTopologyRebuild | TSC 同步 · 大小核拓扑修正 |
+| AMFIPass | 部分场景替代 AMFI 补丁 |
+| AppleMCEReporterDisabler | 关掉 MCE 报错 |
+| RestrictEvents | 屏蔽部分机型检测 |
+| BrightnessKeys | 亮度快捷键 |
+| LegionI2CArrowLake | I2C 触摸板适配（Arrow Lake 平台） |
+
+**关闭的**：`SMCSuperIO`、`UTBDefault`、`itlwm`（与 AirportItlwm 二选一，当前用 AirportItlwm）。
+
+### 关键参数
+
+| 项 | 值 |
+|---|---|
+| SMBIOS | `MacBookPro16,1` |
+| `csr-active-config` | `430A0000`（降级 SIP） |
+| `SecureBootModel` | `Disabled` |
+| `ResizeGpuBars` / `ResizeAppleGpuBars` | `13` / `-1` |
+| Kernel Block | `com.apple.iokit.IONDRVSupport`（Exclude，启用） |
+| `boot-args` | 见上面「三、驱动安装与定制」 |
+
+---
+
+<a name="sec8"></a>
+## 八、常见问题 FAQ
+
+### 卡在 `EB`（`EB.WL.PWLFNV` 之类）
+
+**VT-d 没关。** 进 BIOS 关掉 VT-d（或 `VT for Directed I/O`），这是最高发的原因。
+
+> ⚠️ **天选6 Pro 上关不掉 VT-d？先关「Intel 可信执行技术（Intel TXT）」。**
+> 这台机器的 VT-d 被 TXT 锁着，正确顺序是：**关「安全启动控制」→ 关 Intel TXT → 关 VT-d**。
+> 关掉「安全启动控制」后重进 BIOS，Secure Boot 会自己变成关闭状态。
+
+### 乱码 + 禁止符号 🚫
+
+**USB 端口没定制**，或者 USB 相关 SSDT/kext 不对。
+
+- 用 **USBToolBox** 重新定制：<https://github.com/USBToolBox/tool>
+- 或在 BIOS 里临时把 `XHCI Hand-off` 打开应急
+
+### 跑码卡住 / 装完反复重启
+
+- **跑码卡住 = EFI 问题**，回去重新配 EFI
+- 安装过程会**多次重启**，每次都要从 **U 盘启动**，选 `macOS Installer` 继续
+- 装完第一次进桌面之前，**不要拔 U 盘**
+
+### 改了 BIOS 之后 Windows 蓝屏 `INACCESSIBLE_BOOT_DEVICE`
+
+**VMD / RST 模式变了。** 回 BIOS 把硬盘控制器改回来，
+或按「一、第 6 步」改注册表后进安全模式切换。
+
+### 切系统时间差 8 小时
+
+见「六、双系统时间同步」。
+
+> 上面四条是我这次实际踩到的。其它报错的详细排查，见下面「九、延伸阅读」。
+
+---
+
+<a name="sec9"></a>
+## 九、延伸阅读（详细教程）
+
+这三份是我自己查得最多的，内容比本文细得多。**遇到本文没写到的报错，先去这里找。**
+
+| 来源 | 内容 |
+|---|---|
+| [黑苹果屋 · OpenCore 引导各种卡 & 常见问题速查表合集](https://imacos.top/2021/01/19/0154/) | **按报错原文分类的速查表**：`OCB: StartImage failed`、`OCABC: Memory pool allocation failure`、`apfs_module_start`、禁止符号、黑屏、卡 EB…… 一条条给解决方案。适合拿着屏幕上的报错直接搜。 |
+| [黑苹果星球 · OpenCore 安装卡住的拯救手册 Q&A](https://heipg.cn/tutorial/opencore-install-errors-handbook.html) | **Q&A 式的系统排查手册**：从「新手常见错误」到「启动界面 / 代码界面」再到「其他」，写清了每个 config.plist 选项该填什么、每个 Quirk 是干什么的。适合系统性地过一遍。 |
+| [CSDN · 相关详细教程](https://blog.csdn.net/gitblog_00456/article/details/155172793) | 第三方博客上的详细教程（收录时站点返回 521 打不开，链接照原样保留，稍后再试）。 |
+
+> 三份都是**外部资料**，内容与版权归原作者所有，本仓库只收录链接、不转载正文。
+
+---
+
+<a name="sec10"></a>
+## 十、用到的软件与驱动（官网）
+
+| 软件 | 用途 | 官方地址 |
+|---|---|---|
+| Ubuntu Desktop | 系统镜像 | <https://ubuntu.com/download/desktop> |
+| balenaEtcher | 烧录 ISO / DMG 到 U 盘 | <https://etcher.balena.io/> |
+| DiskGenius | 分区管理 / 编辑 EFI | <https://www.diskgenius.com/> |
+| OpenCorePkg | OpenCore 引导器本体 | <https://github.com/acidanthera/OpenCorePkg> |
+| OCAuxiliaryTools (OCAT) | OpenCore 图形化配置 | <https://github.com/ic005k/OCAuxiliaryTools> |
+| RapidEFI-Tool | 自动生成机型 EFI | <https://github.com/JeoJay127/RapidEFI-Tool> |
+| Dortania OpenCore Guide | 黑苹果权威教程 | <https://dortania.github.io/OpenCore-Install-Guide/> |
+| **nvidia-macos-driver（1401）** | **NVIDIA 显卡驱动（转载来源）** | <https://github.com/nullmoth/nvidia-macos-driver> |
+| **1401** | **NVIDIA 驱动项目主页** | <https://github.com/nullmoth/1401> |
+| EasyUEFI | 管理 UEFI 启动项 | <https://www.easyuefi.com/> |
+| USBToolBox | USB 端口定制 | <https://github.com/USBToolBox/tool> |
+| HeliPort | itlwm 的 Wi-Fi 客户端 | <https://github.com/OpenIntelWireless/HeliPort> |
+
+**Kext 来源**（绝大多数是 Acidanthera 官方开源项目）：
+
+| kext | 仓库 |
+|---|---|
+| Lilu · VirtualSMC · WhateverGreen · AppleALC · NVMeFix · RestrictEvents · BrightnessKeys · AppleMCEReporterDisabler · CpuTscSync · VoodooPS2 | <https://github.com/acidanthera> |
+| AirportItlwm · itlwm | <https://github.com/OpenIntelWireless/itlwm> |
+| IntelBluetoothFirmware · IntelBTPatcher | <https://github.com/OpenIntelWireless/IntelBluetoothFirmware> |
+| VoodooI2C · VoodooI2CHID | <https://github.com/VoodooI2C/VoodooI2C> |
+| RealtekRTL8111 | <https://github.com/Mieze/RTL8111_driver_for_OS_X> |
+| USBToolBox · USBMap | <https://github.com/USBToolBox/kext> |
+| CpuTopologyRebuild | <https://github.com/b00t0x/CpuTopologyRebuild> |
+
+---
+
+<a name="sec11"></a>
+## 十一、目录说明
+
+| 路径 | 内容 |
+|---|---|
+| `README.md` | 本文档（安装教程） |
+| `安装Windows+其他多系统.txt` | 我最初的原始笔记（未整理版） |
+| `EFI/` | 调通的 OpenCore EFI（可直接对比参考） |
+| `USB定制/` | USB 端口数据（`usb.json`）与 `USBMap.kext` |
+| `session-log/` | 原始对话日志含唯一标识，**已于 2026-10-28 移除** |
+
+---
+
+<a name="sec12"></a>
+## 十二、macOS 26（Tahoe）迁移记录
+
+> 这一节是**升级到 macOS 26 之后**的排障记录。
+> **上面的 `EFI/` 是 macOS 15 的**，到 macOS 26 有几处必须重做。
+
+### 12.1 USB 全部失效 —— 属性名改了
+
+Tahoe 把 USB 端口的属性名从 **`UsbConnector` / `port`** 改成了 **`usb-port-type` / `usb-port-number`**。
+
+**做法**：在 `USBMap.kext` 的每个端口里**同时保留旧键、新增新键**，并加 `kUSBMuxEnabled = true`。
+我这台 12 个端口这样改完，USB 恢复。
+
+### 12.2 无线（Intel AX210）—— 换 Tahoe 构建
+
+原来的 `AirportItlwm 2.4.0` 是 **Sequoia 构建**，Tahoe 加载不了。
+
+**做法**：换成 Tahoe 构建 **`AirportItlwm-Tahoe-v2.4.0-RELEASE-alpha`**（`tahoe-vtd-1`），
+并在 `boot-args` 里加 **`itlwm_he=1`**。
+
+- 项目地址：<https://github.com/laobamac/itlwm>
+
+### 12.3 音频（Realtek ALC256）—— AppleHDA 被移除了
+
+**macOS 26 移除了 `AppleHDA.kext`**，所以 AppleALC 没有后端可用。
+
+**做法**：装 **`SimpleHDA-Tahoe-v1.0.0-RELEASE`**，在 `Kernel → Add` 里排在 `AppleALC` **之后**，
+`MinKernel = 25.0.0` / `MaxKernel = 25.99.99`。
+
+- 项目地址：<https://github.com/laobamac/SimpleHDA>
+
+### 12.4 OpenCore 从 DEBUG 换回 RELEASE（不再跑码）
+
+- 从 `boot-args` 移除 **`-v`**
+- OpenCore **1.0.9 DEBUG → 1.0.9 RELEASE**（Dortania 构建）
+- 替换 `OpenCore.efi`、`BOOTx64.efi` 及 `OpenRuntime / OpenCanopy / ResetNvramEntry / OpenLinuxBoot`
+- `Misc → Debug → Target = 0`、`DisplayLevel = 0`、`AppleDebug = false`
+
+### 12.5 OC 里的 Ubuntu 引导项 —— 相对路径不行
+
+自定义 Ubuntu 项用相对路径会报 `OCB: LoadImage failed - Not Found`。
+
+**做法**：改成**完整 UEFI 设备路径**：
+
+```
+PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\EFI\ubuntu\shimx64.efi
+```
+
+两个坑：
+
+- `PciRoot` 是 **`0x1`**，不是常见的 `0x0`
+- NVMe 的 EUI64 在 UEFI 里写作 `XX-XX-XX-XX-XX-XX-XX-XX`，
+  和 Linux `sysfs` 里的 `XX-XX-XX-XX-XX-XX-XX-XX` **正好反序**
+
+### 12.6 睡眠「睡死」—— 已解决
+
+2026-10-28 定位到两个实际问题：`sleepimage` 只有 1 GB（内存 32 GB），且 `/var/vm` 没有指向 VM 卷。修复：
+
+- `sudo pmset -a hibernatemode 0 standby 0 autopoweroff 0 powernap 0`
+- 备份并重建 `/private/var/vm -> /System/Volumes/VM`
+- `DisableRtcChecksum=true` 已开启
+
+结果：睡眠/唤醒正常。详见 [13.3 睡眠](#sleep)。
+
+### 12.7 触控板（ELAN 04F3:32E2，I2C-HID）—— **已解决**
+
+2026-10-28 已解决。根因和完整补丁见 [13.1 触控板](#touchpad)。
+
+- `LegionI2CArrowLake.kext` 的 `IOClass` 从 `VoodooI2CPCILakeController` 改成 `VoodooI2CPCIController`
+- VoodooI2C 打补丁：先判断 `-vi2c-force-polling`，再判断 APIC
+- VoodooI2CHID 打补丁：`Interrupt Mode=Polling` 时强制使用 200 ms 定时器
+- 备份和补丁版路径见 13.1 / 13.11
+
+### 12.8 macOS 26 下的关键配置
+
+| 项 | 值 |
+|---|---|
+| OpenCore | **1.0.9 RELEASE**（Dortania build-repo，`OpenCorePkg-78d5ff8`）|
+| SMBIOS | `MacBookPro16,1` |
+| `csr-active-config` | `0A43`（SIP 关闭）|
+| `SecureBootModel` | `Disabled` |
+| `DisableIoMapper` | `true` |
+| `DisableRtcChecksum` | `true` |
+| `ACPI → Delete` | `DMAR`，`All=true`、`Enabled=true` |
+| `Kernel → Add` | `AsusSMC.kext`（1.4.1，测试 Fn/背光）|
+| `Misc → Boot → Timeout` | `5` |
+| `Misc → Debug → Target` | `67`（AppleDebug/ApplePanic=true）|
+| `Misc → Entries` | Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径 |
+| `Kernel → Add` 末尾 | `SimpleHDA.kext`（25.0.0–25.99.99）|
+| 已禁用 | `itlwm` · `UTBDefault` · `SMCSuperIO` |
+
+**`boot-args`（macOS 26 当前）**：
+
+```
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm
+```
+
+> 注意：**没有 `-v`**（不再跑码），**没有 `-wegnoegpu`**（不能禁 N 卡）。
+
+### 12.9 驱动版本（macOS 26）
+
+| 组件 | 版本 |
+|---|---|
+| Lilu | 1.7.3 |
+| VirtualSMC / SMC 插件 | 1.3.9 |
+| WhateverGreen | 1.7.2 |
+| AppleALC | 1.9.9 |
+| SimpleHDA | 1.0.0 |
+| NVMeFix | 1.1.4 |
+| RestrictEvents | 1.1.7 |
+| AMFIPass | 1.4.1 |
+| AirportItlwm | 2.4.0（Tahoe 构建）|
+| itlwm | 2.3.0（禁用）|
+| IntelBluetoothFirmware / IntelBTPatcher | 2.5.0 |
+| BlueToolFixup | 2.7.3 |
+| VoodooI2C | 2.9.1（已打 force-polling 补丁）|
+| VoodooI2CHID | 1（已打 Polling 定时器补丁）|
+| AsusSMC | 1.4.1（键盘背光不支持）|
+| VoodooPS2Controller | 2.3.8 |
+| USBMap / USBToolBox | 1.1（已改 Tahoe 键）/ 1.2.0 |
+| LegionI2CArrowLake | 1.1.0（IOClass 改为 `VoodooI2CPCIController`）|
+
+### 12.10 相关素材
+
+| 路径 | 内容 |
+|---|---|
+| `macos26/README.md` | 这次迁移的**完整原始报告** |
+| `macos26/evidence/` | 取证材料 13 份：`lspci` · `lsblk` · `efibootmgr` · `kexts` · `config-diff` · `mont` … |
+| `macos26/scripts/` | `fix-sleep-pmset.sh` · `diagnose-sleep.sh` · `find-voodooi2c.sh` |
+| `macos26/config.plist` | macOS 26 下的当前配置（供对照）|
+| `macos26/session/` | 原始会话日志含真实序列号/MLB/UUID，**已于 2026-10-28 移除**；仅保留脱敏摘要 |
+| `session-log/` | 含唯一标识的原始会话归档，**已于 2026-10-28 移除** |
+| `docs/maclator-usage.md` | maclator 使用教程（本机部署验证后已清理）|
+
+> ⚠️ **升级前务必保留 macOS 15 版本的 EFI**（就是仓库里的 `EFI/`），
+> 否则万一 macOS 26 起不来，没有回滚的路。
 
 ---
 
 <a name="maintenance"></a>
-## 零、2026-10-28 本次维护与修复总览
+## 十三、安装后的维护与修复（2026-10-28）
 
-这一节是本次维护新增的内容，**触控板放在最前面**。原有安装指南保留在后面的章节。
+这一节是**系统安装完成后的维护与修复记录**（2026-10-28）；安装指南在本文前面的章节，触控板放在本节最前面。
 
 ### 本次实测环境
 
@@ -70,7 +674,7 @@
 ---
 
 <a name="touchpad"></a>
-### 0.1 触控板（重点，已解决）
+### 13.1 触控板（重点，已解决）
 
 #### 硬件与症状
 
@@ -216,7 +820,7 @@ EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 ---
 
 <a name="efi-checks"></a>
-### 0.2 1401 EFI 检查 4 项
+### 13.2 1401 EFI 检查 4 项
 
 1401 的 “Check my EFI” 只读不写，它报的 4 项对应以下修改（都在 `EFI/OC/config.plist`）：
 
@@ -247,7 +851,7 @@ amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4
 ---
 
 <a name="sleep"></a>
-### 0.3 睡眠 / 休眠（已解决）
+### 13.3 睡眠 / 休眠（已解决）
 
 本机 32 GB 内存，但原来的 `sleepimage` 只有 **1.0 GB**；而且 `/var/vm` 是一个普通目录，落在 Data 卷上，没有指向 VM 卷。`hibernatemode 3` 下休眠镜像根本写不下，容易出现 `Sleep Wake failure in EFI` / 睡死。
 
@@ -276,7 +880,7 @@ df -h /var/vm     # 应显示 /dev/disk2s6（VM 卷）
 ---
 
 <a name="keyboard"></a>
-### 0.4 键盘、Fn、AsusSMC、键盘背光、Fn+F10
+### 13.4 键盘、Fn、AsusSMC、键盘背光、Fn+F10
 
 #### Windows 键盘习惯
 
@@ -322,7 +926,7 @@ defaults write com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad -bool tru
 ---
 
 <a name="fan"></a>
-### 0.5 风扇与功耗
+### 13.5 风扇与功耗
 
 本机内屏 `MNG007DA5-3`（2560×1600 165 Hz）接在 RTX 5070 上，Intel iGPU 显示 “No Kext Loaded”。macOS 下没有 Windows 的 Optimus/核显桌面模式，**dGPU 一直在驱动内屏**，待机功耗和发热基线就比 Windows 高，风扇更容易起来。
 
@@ -339,7 +943,7 @@ defaults write com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad -bool tru
 ---
 
 <a name="scaling"></a>
-### 0.6 显示缩放 / HiDPI
+### 13.6 显示缩放 / HiDPI
 
 显示器实际暴露的模式（用 CoreGraphics 列出）：
 
@@ -363,7 +967,7 @@ defaults write com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad -bool tru
 ---
 
 <a name="render"></a>
-### 0.7 网页滚动破碎 / 渲染异常
+### 13.7 网页滚动破碎 / 渲染异常
 
 准确描述：不是花屏/闪烁，而是**滚动网页时出现像拼图被打乱的块**；静止正常。更像 WindowServer/NVAccel 的 **scan-out / 部分更新** 路径问题，不是 DSC 高刷新闪烁。
 
@@ -382,9 +986,11 @@ defaults write com.apple.AppleMultitouchTrackpad USBMouseStopsTrackpad -bool tru
 ---
 
 <a name="maclator"></a>
-### 0.8 maclator 部署与使用
+### 13.8 maclator 部署与使用
 
 maclator 是“反向 Rosetta”：在 Intel Mac 上运行 arm64 macOS 应用。本次已在本机完成部署验证，随后按用户要求清理了安装文件；完整教程见仓库 [`docs/maclator-usage.md`](docs/maclator-usage.md)。
+
+> 原项目仓库：<https://github.com/linuxkid473/maclator>（maclator 是 linuxkid473 的项目；本仓库只记录部署/使用，不包含其源码。）
 
 本机验证结果：
 
@@ -409,7 +1015,7 @@ maclator 是“反向 Rosetta”：在 Intel Mac 上运行 arm64 macOS 应用。
 ---
 
 <a name="menubar"></a>
-### 0.9 菜单栏图标间距
+### 13.9 菜单栏图标间距
 
 天选 6 Pro 没有刘海，但菜单栏图标间距可以调小/调大：
 
@@ -431,7 +1037,7 @@ defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding
 ---
 
 <a name="status"></a>
-### 0.10 当前状态：已解决 / 未解决
+### 13.10 当前状态：已解决 / 未解决
 
 | 问题 | 状态 |
 |---|---|
@@ -450,7 +1056,7 @@ defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding
 ---
 
 <a name="backup"></a>
-### 0.11 备份、恢复与 SMBIOS
+### 13.11 备份、恢复与 SMBIOS
 
 - 修改 EFI 前的完整备份：本机 `~/Documents/ASUS-FX608LP-Hackintosh-backup/EFI-backups/EFI-backup-20261027-221905.zip`
 - 触控板补丁原版备份：
@@ -470,592 +1076,8 @@ EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 
 ---
 
-## ⚠️ 重要声明（务必先读）
-
-**1. 显卡驱动是转载，不是我写的**
-
-macOS 下的 NVIDIA 驱动来自开源项目 **1401 / nullmoth**：
-
-- 驱动仓库：<https://github.com/nullmoth/nvidia-macos-driver>
-- 1401 项目：<https://github.com/nullmoth/1401>
-
-**本仓库不包含该驱动的任何源码，也没有对它做任何修改**，只是记录「我用它跑通了」这件事并给出安装步骤。驱动的版权、署名、授权全部归原作者 **nullmoth** 及 1401 项目贡献者所有。使用前请到上面两个仓库阅读其许可证与说明。
-
-**2. 只在我的硬件上验证过**
-
-下面的 EFI、ACPI、USB 定制、SMBIOS 全部是为这一台机器调的。**别的机器直接用大概率开不了机**，最坏情况会清掉你的引导项。请把它当作「参考案例」，而不是「通用 EFI」。
-
-**3. 风险自负**
-
-黑苹果需要关闭 Secure Boot、修改 SIP、打内核补丁、屏蔽核显。可能造成：数据丢失、系统无法启动、Windows 蓝屏、失去保修、iCloud/iMessage 账号异常。**请先备份，重要数据不要只存一份。**
-
-**4. 不含任何 Apple 受版权保护的内容**
-
-仓库里没有 macOS 安装镜像、没有 Apple 的驱动文件。系统镜像请自行通过 Apple 官方渠道获取。
-
-**5. SMBIOS 已脱敏，请自己生成**
-
-仓库里的 `SystemSerialNumber`、`MLB`、`SystemUUID`、`ROM` 已替换为占位符（`XXXXXXXXXXXX` / `XXXXXXXXXXXXXXXXX` / 全 0 UUID / 全 0 ROM）。**请务必用 OCAT、GenSMBIOS 或 OpenCore Configurator 重新生成一套你自己的**，不要直接使用占位符，也不要多台机器共用同一套 —— 会导致 iCloud / iMessage 被锁。2026-10-28 已对当前文件和 git 历史做脱敏；如果你在 fork、缓存或旧 commit 里看到旧值，请以最新 `main` 为准。
-
----
-
-## 硬件信息
-
-| 部件 | 型号 | macOS 下状态 |
-|---|---|---|
-| 整机 | **ASUS FX608LP**（华硕天选6 Pro） | — |
-| CPU | **Intel Core Ultra 9 275HX**（Arrow Lake-HX，24 核 8P+16E，无超线程） | ✅ 需 CPUID 伪装 + CpuTopologyRebuild |
-| 核显 | Intel Graphics（`8086:7D67`，Xe-LPG，Arrow Lake-H/HX） | ❌ macOS 无驱动，**已屏蔽** |
-| 独显 | **NVIDIA GeForce RTX 5070 Laptop**（GB206，`10DE:2D58`，支持 MUX 独显直连） | ⚠️ 靠 1401 驱动 |
-| 无线 | Intel Wi-Fi 6E **AX210**（`8086:2725`） | ✅ AirportItlwm |
-| 蓝牙 | Intel 蓝牙（走 USB） | ✅ IntelBluetoothFirmware + BlueToolFixup |
-| 声卡 | Realtek **ALC256** | ✅ AppleALC（`alcid=13`） |
-| 有线网卡 | Realtek **RTL8168** | ✅ RealtekRTL8111 |
-| 屏幕 | 2560 × 1600 | ✅ 需 `ResizeGpuBars=13` |
-| 硬盘 | NVMe SSD | ✅ 需 NVMeFix |
-| 电池 | ASUS GU60558 | ✅ SMCBatteryManager |
-
-**SMBIOS 机型：`MacBookPro16,1`**（这是为了骗过 macOS 的机型检查，不代表真实硬件）
-
----
-
-## 一、Windows + Ubuntu 26.04 LTS（Intel 新平台）
-
-> 顺序建议：**先装 Windows，再装 Ubuntu**。装完 Windows 再动分区，引导关系更清楚。
-
-### 1. 下载系统镜像
-
-Ubuntu 26.04 LTS Desktop：<https://ubuntu.com/download/desktop>
-
-### 2. 烧录到 U 盘
-
-用 **balenaEtcher**：<https://etcher.balena.io/>
-
-### 3. 硬盘分区
-
-进 PE，用 **DiskGenius**：<https://www.diskgenius.com/>
-
-给 Ubuntu 留出未分配空间（建议 ≥ 80 GB）。
-
-### 4. BIOS 设置
-
-- 关闭 **Secure Boot**
-- 关闭 **Intel RST**（或在 RAID 模式下切到 AHCI）
-- 关闭 **Windows BitLocker**（控制面板 → 设备加密）
-
-### 5. 确认硬盘控制器类型
-
-在 Windows 里看硬盘控制器是不是 **AHCI**、有没有开 **VMD**。
-
-### 6. ⚠️ 关闭 VMD（Intel 新平台必做，否则改 BIOS 会蓝屏）
-
-**先备份注册表**，然后按 Ubuntu 官方教程改：
-
-<https://ubuntu.com/desktop/docs/en/26.04/how-to/reconfigure-windows-to-use-ahci/>
-
-> **官方教程漏了 NVMe！** 除了教程里写的 `stornvme`，NVMe 硬盘还要改
-> `HKLM\SYSTEM\CurrentControlSet\Services\stornvme` 下的 `StartOverride`。
-> 改完**必须进一次安全模式**强制切换驱动，否则重启直接蓝屏。
-
-### 7. 进安全模式验证
-
-进安全模式前，先在 BIOS 里关闭 **VMD**（或把硬盘控制器切成 **AHCI**），
-重启后确认设备管理器里已经变成「标准 NVM Express 控制器」。
-
-### 8. 从 U 盘启动，安装 Ubuntu
-
-- **不要勾选任何「在线下载」相关的选项**（会卡网络）
-- 如果机器**没有核显**（或核显被禁用），启动界面选第二项 **safe boot**
-
-### 9. 分区
-
-选中你留出的空闲空间 → 点左下角 **「+」**：
-
-- 挂载点选 **`/`**
-- 引导加载器安装位置选**这块硬盘**
-
-> **不推荐**把 Ubuntu 的 EFI 分区和 Windows 的 EFI 分区合并共存，容易把 Windows 引导搞坏。
-
-### 10. 完成设置
-
----
-
-## 二、macOS 15.7.8 黑苹果
-
-### 1. 开启独显直连
-
-BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
-核显在 macOS 下没有驱动，必须屏蔽，否则会黑屏或卡进度条。
-
-### 2. 用 RapidEFI 生成 EFI
-
-<https://github.com/JeoJay127/RapidEFI-Tool>
-
-选对应机型后生成。**注意：一定要人工复核！** 自动生成的配置不能直接信，尤其是：
-
-- **屏蔽核显**（`-wegnoegpu` 或设备属性里禁用 iGPU）
-- CPUID 伪装（Arrow Lake 需要）
-- SMBIOS 机型
-
-> 本仓库 `EFI/` 里就是我**复核并调通之后**的成品，可以直接对比。
-
-### 3. 烧录 macOS 镜像
-
-用 **balenaEtcher** 把 dmg 烧到 U 盘（镜像自行获取）。
-
-### 4. 替换 U 盘 EFI
-
-用 **DiskGenius** 打开 U 盘的 EFI 分区，用第 2 步生成的 EFI 替换掉原有的。
-
-### 5. BIOS 检查
-
-| 项 | 设置 |
-|---|---|
-| **Intel 可信执行技术（Intel TXT）** | **先关闭** ← 天选的 VT-d 被 TXT 锁着，不先关它 VT-d 关不掉 |
-| Secure Boot | **关闭**（直接关「安全启动控制」，重进 BIOS 会看到 Secure Boot 已自动变成关闭） |
-| VT-d | **关闭**（不关会卡 EB） |
-| Resizable BAR | **开启** |
-| Above 4G Decoding | **开启** |
-| 独显直连 | **开启** |
-
-> 📌 **天选这台的正确顺序：关「安全启动控制」→ 关「Intel TXT」→ 关 VT-d。**
-> 顺序错了 VT-d 会灰着改不了。
-
-### 6. 从 U 盘启动
-
-进 OpenCore 界面 → 选 **Install macOS**。
-
-> **卡住就停下来查，不要反复重试。** 跑码卡住 99% 是 EFI 配置问题。
-
-### 7. 跑码阶段的问题处理
-
-**遇到任何报错，拍照，然后和 AI 一起排查。** 两个最高发的失败点：
-
-- **卡 `EB`** → 几乎都是 **VT-d 没关**
-- **乱码 + 禁止符号（🚫）** → **USB 端口没有定制**（见下面 FAQ）
-
-### 8. 抹盘
-
-进入系统 → **磁盘工具** → 选中要装 macOS 的磁盘 → 右键 **抹掉** → 格式选 **APFS**。
-
-### 9. 安装
-
-退出磁盘工具 → 选 **安装 macOS 15** → 选安装盘 →
-后面会**多次重启**，每次都选 **macOS Installer** 那个启动项，直到进入系统。
-
-> - 中途跑码卡住 = EFI 问题，回去重新配
-> - **每次都要从 U 盘启动**（装好之前硬盘引导还没写好）
-
----
-
-## 三、驱动安装与定制（NVIDIA 独显）
-
-这一步是让 **RTX 5070** 在 macOS 下亮起来的关键。
-
-### 1. 打开 OCAT
-
-<https://github.com/ic005k/OCAuxiliaryTools>
-
-挂载 **ESP 分区**，加载 `EFI/OC/config.plist`。
-
-### 2. 改这些项
-
-**NVRAM → 7C436110-AB2A-4BBB-A880-FE41995C9F82**
-
-- `csr-active-config` → `430A0000`
-- `boot-args` →
-
-```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm -ibtcompatbeta revpatch=sbvmm
-```
-
-**UEFI → Quirks**
-
-- `ResizeGpuBars` → `13`
-
-**Booster → Quirks**
-
-- `ResizeAppleGpuBars` → `-1`
-
-**Kernel → Block**（新增一条）
-
-- `Identifier` = `com.apple.iokit.IONDRVSupport`
-- `Strategy` = `Exclude`
-- 勾选 **Enabled**
-
-**Misc → Security**
-
-- `SecureBootModel` = `Disabled`
-
-### 3. 安装 1401 驱动
-
-下载：<https://github.com/nullmoth/nvidia-macos-driver>
-
-> **下载后不要手动解压**（不要用解压软件双击它），下面的 `tar` 命令会自己解开。
-
-打开「终端」，按顺序做三步：
-
-```bash
-# ① 把下载好的 nullmoth-nvidia-*.tar.gz 拖进终端窗口，
-#    然后删掉末尾的文件名，只保留它所在的目录路径，回车
-cd /拖进来的目录路径/
-
-# ② 解包并进入 pkgroot（校验和安装都在这一层做）
-tar -xzf nullmoth-nvidia-*.tar.gz && cd pkgroot
-
-# ③ 先校验完整性，再安装
-shasum -a 256 -c SHA256SUMS
-sudo ./install.sh
-```
-
-装完之后：
-
-1. 在 **系统设置** 里同意隐私 / 安全弹窗
-2. `sudo shutdown -r now` 重启
-
-> ⚠️ 驱动来自开源项目，**仅支持 macOS 15 Sequoia**（15.x），且要求 Secure Boot 关闭 / SIP 已降级。
-> 版本更新和授权请以作者仓库为准，本仓库不转存、不修改、不分发其任何文件。
-
----
-
-## 四、引导设置（让 EFI 出现在 BIOS 启动项里）
-
-### 1. 准备
-
-用 **EasyUEFI**：<https://www.easyuefi.com/>
-
-先确认 EFI 文件已经复制到 **ESP 分区**。
-
-### 2. 添加引导项
-
-1. 打开 EasyUEFI → **管理 EFI 启动项** → **新建**
-2. 选 **ESP 分区**，类型选 **Linux 及其他**
-3. 文件路径填 `EFI\BOOT\bootx64.efi`
-4. 保存，然后在 BIOS 或软件里把它的顺序调到第一位
-
----
-
-## 五、还原 U 盘
-
-装完之后把 U 盘还原成普通 U 盘（**会清空整个 U 盘**，先确认盘号！）：
-
-```
-diskpart
-list disk
-select disk 2
-clean
-```
-
-> `select disk 2` 里的 **2 一定要换成你 U 盘的盘号**，选错会清掉你的硬盘。
-
----
-
-## 六、双系统时间同步
-
-Windows 默认把 BIOS 时间当本地时间，Linux/macOS 当 UTC，所以切系统会差 8 小时。
-
-**在 Windows 里用管理员权限运行：**
-
-```cmd
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
-```
-
----
-
-## 七、EFI 说明
-
-> ⚠️ **这份 `EFI/` 只适用于 macOS 15（Sequoia）。**
-> macOS 26（Tahoe）改了不少底层的东西 —— USB 端口属性名变了、`AppleHDA.kext` 被移除、无线驱动要换 Tahoe 构建，
-> **必须重新定制 USB / 网卡 / 声卡**。我后来在 macOS 26 上的完整踩坑记录见
-> 「[十二、macOS 26（Tahoe）迁移记录](#十二macos-26tahoe迁移记录)」。
-
-### 目录结构
-
-```
-EFI/
-├── BOOT/            BOOTx64.efi · fbx64.efi · mmx64.efi
-├── OC/              OpenCore 主目录
-│   ├── config.plist   ← 核心配置（已调通）
-│   ├── OpenCore.efi
-│   ├── ACPI/          10 个 SSDT + DSDT.aml
-│   ├── Drivers/       HfsPlus · OpenCanopy · OpenLinuxBoot · OpenRuntime · ResetNvramEntry
-│   ├── Kexts/         28 个驱动（见下表）
-│   ├── Resources/     开机菜单的字体、图标、标签
-│   └── Tools/
-└── ubuntu/          Ubuntu 的 shim + grub（多系统引导）
-USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
-```
-
-### 已启用的 kext（28 项）
-
-| kext | 作用 |
-|---|---|
-| Lilu | 几乎所有其它 kext 的基础 |
-| VirtualSMC | 模拟 SMC 芯片（黑苹果必备） |
-| SMCProcessor · SMCLightSensor · SMCBatteryManager | CPU 传感器 · 环境光 · 电池 |
-| WhateverGreen | 显卡通用补丁 |
-| AppleALC | 声卡（`alcid=13`） |
-| AirportItlwm | Intel AX210 无线网卡 |
-| IntelBluetoothFirmware · IntelBTPatcher · BlueToolFixup | Intel 蓝牙 |
-| RealtekRTL8111 | 有线网卡 |
-| NVMeFix | NVMe 电源管理 |
-| USBToolBox · USBMap | USB 端口定制 |
-| VoodooI2C · VoodooI2CHID · VoodooGPIO · VoodooI2CServices | 触摸板（I2C） |
-| VoodooPS2Controller（+Keyboard/Mouse/Trackpad） | 键盘 / 触摸板回退 |
-| CpuTscSync · CpuTopologyRebuild | TSC 同步 · 大小核拓扑修正 |
-| AMFIPass | 部分场景替代 AMFI 补丁 |
-| AppleMCEReporterDisabler | 关掉 MCE 报错 |
-| RestrictEvents | 屏蔽部分机型检测 |
-| BrightnessKeys | 亮度快捷键 |
-| LegionI2CArrowLake | I2C 触摸板适配（Arrow Lake 平台） |
-
-**关闭的**：`SMCSuperIO`、`UTBDefault`、`itlwm`（与 AirportItlwm 二选一，当前用 AirportItlwm）。
-
-### 关键参数
-
-| 项 | 值 |
-|---|---|
-| SMBIOS | `MacBookPro16,1` |
-| `csr-active-config` | `430A0000`（降级 SIP） |
-| `SecureBootModel` | `Disabled` |
-| `ResizeGpuBars` / `ResizeAppleGpuBars` | `13` / `-1` |
-| Kernel Block | `com.apple.iokit.IONDRVSupport`（Exclude，启用） |
-| `boot-args` | 见上面「三、驱动安装与定制」 |
-
----
-
-## 八、常见问题 FAQ
-
-### 卡在 `EB`（`EB.WL.PWLFNV` 之类）
-
-**VT-d 没关。** 进 BIOS 关掉 VT-d（或 `VT for Directed I/O`），这是最高发的原因。
-
-> ⚠️ **天选6 Pro 上关不掉 VT-d？先关「Intel 可信执行技术（Intel TXT）」。**
-> 这台机器的 VT-d 被 TXT 锁着，正确顺序是：**关「安全启动控制」→ 关 Intel TXT → 关 VT-d**。
-> 关掉「安全启动控制」后重进 BIOS，Secure Boot 会自己变成关闭状态。
-
-### 乱码 + 禁止符号 🚫
-
-**USB 端口没定制**，或者 USB 相关 SSDT/kext 不对。
-
-- 用 **USBToolBox** 重新定制：<https://github.com/USBToolBox/tool>
-- 或在 BIOS 里临时把 `XHCI Hand-off` 打开应急
-
-### 跑码卡住 / 装完反复重启
-
-- **跑码卡住 = EFI 问题**，回去重新配 EFI
-- 安装过程会**多次重启**，每次都要从 **U 盘启动**，选 `macOS Installer` 继续
-- 装完第一次进桌面之前，**不要拔 U 盘**
-
-### 改了 BIOS 之后 Windows 蓝屏 `INACCESSIBLE_BOOT_DEVICE`
-
-**VMD / RST 模式变了。** 回 BIOS 把硬盘控制器改回来，
-或按「一、第 6 步」改注册表后进安全模式切换。
-
-### 切系统时间差 8 小时
-
-见「六、双系统时间同步」。
-
-> 上面四条是我这次实际踩到的。其它报错的详细排查，见下面「九、延伸阅读」。
-
----
-
-## 九、延伸阅读（详细教程）
-
-这三份是我自己查得最多的，内容比本文细得多。**遇到本文没写到的报错，先去这里找。**
-
-| 来源 | 内容 |
-|---|---|
-| [黑苹果屋 · OpenCore 引导各种卡 & 常见问题速查表合集](https://imacos.top/2021/01/19/0154/) | **按报错原文分类的速查表**：`OCB: StartImage failed`、`OCABC: Memory pool allocation failure`、`apfs_module_start`、禁止符号、黑屏、卡 EB…… 一条条给解决方案。适合拿着屏幕上的报错直接搜。 |
-| [黑苹果星球 · OpenCore 安装卡住的拯救手册 Q&A](https://heipg.cn/tutorial/opencore-install-errors-handbook.html) | **Q&A 式的系统排查手册**：从「新手常见错误」到「启动界面 / 代码界面」再到「其他」，写清了每个 config.plist 选项该填什么、每个 Quirk 是干什么的。适合系统性地过一遍。 |
-| [CSDN · 相关详细教程](https://blog.csdn.net/gitblog_00456/article/details/155172793) | 第三方博客上的详细教程（收录时站点返回 521 打不开，链接照原样保留，稍后再试）。 |
-
-> 三份都是**外部资料**，内容与版权归原作者所有，本仓库只收录链接、不转载正文。
-
----
-
-## 十、用到的软件与驱动（官网）
-
-| 软件 | 用途 | 官方地址 |
-|---|---|---|
-| Ubuntu Desktop | 系统镜像 | <https://ubuntu.com/download/desktop> |
-| balenaEtcher | 烧录 ISO / DMG 到 U 盘 | <https://etcher.balena.io/> |
-| DiskGenius | 分区管理 / 编辑 EFI | <https://www.diskgenius.com/> |
-| OpenCorePkg | OpenCore 引导器本体 | <https://github.com/acidanthera/OpenCorePkg> |
-| OCAuxiliaryTools (OCAT) | OpenCore 图形化配置 | <https://github.com/ic005k/OCAuxiliaryTools> |
-| RapidEFI-Tool | 自动生成机型 EFI | <https://github.com/JeoJay127/RapidEFI-Tool> |
-| Dortania OpenCore Guide | 黑苹果权威教程 | <https://dortania.github.io/OpenCore-Install-Guide/> |
-| **nvidia-macos-driver（1401）** | **NVIDIA 显卡驱动（转载来源）** | <https://github.com/nullmoth/nvidia-macos-driver> |
-| **1401** | **NVIDIA 驱动项目主页** | <https://github.com/nullmoth/1401> |
-| EasyUEFI | 管理 UEFI 启动项 | <https://www.easyuefi.com/> |
-| USBToolBox | USB 端口定制 | <https://github.com/USBToolBox/tool> |
-| HeliPort | itlwm 的 Wi-Fi 客户端 | <https://github.com/OpenIntelWireless/HeliPort> |
-
-**Kext 来源**（绝大多数是 Acidanthera 官方开源项目）：
-
-| kext | 仓库 |
-|---|---|
-| Lilu · VirtualSMC · WhateverGreen · AppleALC · NVMeFix · RestrictEvents · BrightnessKeys · AppleMCEReporterDisabler · CpuTscSync · VoodooPS2 | <https://github.com/acidanthera> |
-| AirportItlwm · itlwm | <https://github.com/OpenIntelWireless/itlwm> |
-| IntelBluetoothFirmware · IntelBTPatcher | <https://github.com/OpenIntelWireless/IntelBluetoothFirmware> |
-| VoodooI2C · VoodooI2CHID | <https://github.com/VoodooI2C/VoodooI2C> |
-| RealtekRTL8111 | <https://github.com/Mieze/RTL8111_driver_for_OS_X> |
-| USBToolBox · USBMap | <https://github.com/USBToolBox/kext> |
-| CpuTopologyRebuild | <https://github.com/b00t0x/CpuTopologyRebuild> |
-
----
-
-## 十一、目录说明
-
-| 路径 | 内容 |
-|---|---|
-| `README.md` | 本文档（安装教程） |
-| `安装Windows+其他多系统.txt` | 我最初的原始笔记（未整理版） |
-| `EFI/` | 调通的 OpenCore EFI（可直接对比参考） |
-| `USB定制/` | USB 端口数据（`usb.json`）与 `USBMap.kext` |
-| `session-log/` | 原始对话日志含唯一标识，**已于 2026-10-28 移除** |
-
----
-
-## 十二、macOS 26（Tahoe）迁移记录
-
-> 这一节是**升级到 macOS 26 之后**的排障记录。
-> **上面的 `EFI/` 是 macOS 15 的**，到 macOS 26 有几处必须重做。
-
-### 12.1 USB 全部失效 —— 属性名改了
-
-Tahoe 把 USB 端口的属性名从 **`UsbConnector` / `port`** 改成了 **`usb-port-type` / `usb-port-number`**。
-
-**做法**：在 `USBMap.kext` 的每个端口里**同时保留旧键、新增新键**，并加 `kUSBMuxEnabled = true`。
-我这台 12 个端口这样改完，USB 恢复。
-
-### 12.2 无线（Intel AX210）—— 换 Tahoe 构建
-
-原来的 `AirportItlwm 2.4.0` 是 **Sequoia 构建**，Tahoe 加载不了。
-
-**做法**：换成 Tahoe 构建 **`AirportItlwm-Tahoe-v2.4.0-RELEASE-alpha`**（`tahoe-vtd-1`），
-并在 `boot-args` 里加 **`itlwm_he=1`**。
-
-- 项目地址：<https://github.com/laobamac/itlwm>
-
-### 12.3 音频（Realtek ALC256）—— AppleHDA 被移除了
-
-**macOS 26 移除了 `AppleHDA.kext`**，所以 AppleALC 没有后端可用。
-
-**做法**：装 **`SimpleHDA-Tahoe-v1.0.0-RELEASE`**，在 `Kernel → Add` 里排在 `AppleALC` **之后**，
-`MinKernel = 25.0.0` / `MaxKernel = 25.99.99`。
-
-- 项目地址：<https://github.com/laobamac/SimpleHDA>
-
-### 12.4 OpenCore 从 DEBUG 换回 RELEASE（不再跑码）
-
-- 从 `boot-args` 移除 **`-v`**
-- OpenCore **1.0.9 DEBUG → 1.0.9 RELEASE**（Dortania 构建）
-- 替换 `OpenCore.efi`、`BOOTx64.efi` 及 `OpenRuntime / OpenCanopy / ResetNvramEntry / OpenLinuxBoot`
-- `Misc → Debug → Target = 0`、`DisplayLevel = 0`、`AppleDebug = false`
-
-### 12.5 OC 里的 Ubuntu 引导项 —— 相对路径不行
-
-自定义 Ubuntu 项用相对路径会报 `OCB: LoadImage failed - Not Found`。
-
-**做法**：改成**完整 UEFI 设备路径**：
-
-```
-PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0xDB8AD800,0x219800)/\EFI\ubuntu\shimx64.efi
-```
-
-两个坑：
-
-- `PciRoot` 是 **`0x1`**，不是常见的 `0x0`
-- NVMe 的 EUI64 在 UEFI 里写作 `XX-XX-XX-XX-XX-XX-XX-XX`，
-  和 Linux `sysfs` 里的 `XX-XX-XX-XX-XX-XX-XX-XX` **正好反序**
-
-### 12.6 睡眠「睡死」—— 已解决
-
-2026-10-28 定位到两个实际问题：`sleepimage` 只有 1 GB（内存 32 GB），且 `/var/vm` 没有指向 VM 卷。修复：
-
-- `sudo pmset -a hibernatemode 0 standby 0 autopoweroff 0 powernap 0`
-- 备份并重建 `/private/var/vm -> /System/Volumes/VM`
-- `DisableRtcChecksum=true` 已开启
-
-结果：睡眠/唤醒正常。详见 [0.3 睡眠](#sleep)。
-
-### 12.7 触控板（ELAN 04F3:32E2，I2C-HID）—— **已解决**
-
-2026-10-28 已解决。根因和完整补丁见 [0.1 触控板](#touchpad)。
-
-- `LegionI2CArrowLake.kext` 的 `IOClass` 从 `VoodooI2CPCILakeController` 改成 `VoodooI2CPCIController`
-- VoodooI2C 打补丁：先判断 `-vi2c-force-polling`，再判断 APIC
-- VoodooI2CHID 打补丁：`Interrupt Mode=Polling` 时强制使用 200 ms 定时器
-- 备份和补丁版路径见 0.1 / 0.11
-
-### 12.8 macOS 26 下的关键配置
-
-| 项 | 值 |
-|---|---|
-| OpenCore | **1.0.9 RELEASE**（Dortania build-repo，`OpenCorePkg-78d5ff8`）|
-| SMBIOS | `MacBookPro16,1` |
-| `csr-active-config` | `0A43`（SIP 关闭）|
-| `SecureBootModel` | `Disabled` |
-| `DisableIoMapper` | `true` |
-| `DisableRtcChecksum` | `true` |
-| `ACPI → Delete` | `DMAR`，`All=true`、`Enabled=true` |
-| `Kernel → Add` | `AsusSMC.kext`（1.4.1，测试 Fn/背光）|
-| `Misc → Boot → Timeout` | `5` |
-| `Misc → Debug → Target` | `67`（AppleDebug/ApplePanic=true）|
-| `Misc → Entries` | Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径 |
-| `Kernel → Add` 末尾 | `SimpleHDA.kext`（25.0.0–25.99.99）|
-| 已禁用 | `itlwm` · `UTBDefault` · `SMCSuperIO` |
-
-**`boot-args`（macOS 26 当前）**：
-
-```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm
-```
-
-> 注意：**没有 `-v`**（不再跑码），**没有 `-wegnoegpu`**（不能禁 N 卡）。
-
-### 12.9 驱动版本（macOS 26）
-
-| 组件 | 版本 |
-|---|---|
-| Lilu | 1.7.3 |
-| VirtualSMC / SMC 插件 | 1.3.9 |
-| WhateverGreen | 1.7.2 |
-| AppleALC | 1.9.9 |
-| SimpleHDA | 1.0.0 |
-| NVMeFix | 1.1.4 |
-| RestrictEvents | 1.1.7 |
-| AMFIPass | 1.4.1 |
-| AirportItlwm | 2.4.0（Tahoe 构建）|
-| itlwm | 2.3.0（禁用）|
-| IntelBluetoothFirmware / IntelBTPatcher | 2.5.0 |
-| BlueToolFixup | 2.7.3 |
-| VoodooI2C | 2.9.1（已打 force-polling 补丁）|
-| VoodooI2CHID | 1（已打 Polling 定时器补丁）|
-| AsusSMC | 1.4.1（键盘背光不支持）|
-| VoodooPS2Controller | 2.3.8 |
-| USBMap / USBToolBox | 1.1（已改 Tahoe 键）/ 1.2.0 |
-| LegionI2CArrowLake | 1.1.0（IOClass 改为 `VoodooI2CPCIController`）|
-
-### 12.10 相关素材
-
-| 路径 | 内容 |
-|---|---|
-| `macos26/README.md` | 这次迁移的**完整原始报告** |
-| `macos26/evidence/` | 取证材料 13 份：`lspci` · `lsblk` · `efibootmgr` · `kexts` · `config-diff` · `mont` … |
-| `macos26/scripts/` | `fix-sleep-pmset.sh` · `diagnose-sleep.sh` · `find-voodooi2c.sh` |
-| `macos26/config.plist` | macOS 26 下的当前配置（供对照）|
-| `macos26/session/` | 原始会话日志含真实序列号/MLB/UUID，**已于 2026-10-28 移除**；仅保留脱敏摘要 |
-| `session-log/` | 含唯一标识的原始会话归档，**已于 2026-10-28 移除** |
-| `docs/maclator-usage.md` | maclator 使用教程（本机部署验证后已清理）|
-
-> ⚠️ **升级前务必保留 macOS 15 版本的 EFI**（就是仓库里的 `EFI/`），
-> 否则万一 macOS 26 起不来，没有回滚的路。
-
----
-
-## 十三、声明与致谢
+<a name="sec14"></a>
+## 十四、声明与致谢
 
 ### 本仓库由 `deepseek-flash` 上传
 
