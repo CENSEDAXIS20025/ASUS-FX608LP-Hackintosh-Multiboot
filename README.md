@@ -189,15 +189,25 @@ BIOS 里把显示输出切到 **独显直连（MUX / Discrete GPU only）**。
 
 <https://github.com/nullmoth/1401>
 
-Windows 下的**一条龙工具**：检查硬件 → 生成 OpenCore → 下载 macOS → **直接写好安装 U 盘**。
+Windows 下的开源工具：检查硬件 → 生成 OpenCore →（可选）下载 macOS 并写 U 盘。
 它基于 [OpCore-Simplify](https://github.com/lzhoang2801/OpCore-Simplify) 再套自己的规则，
 **专门带了 Arrow Lake 的处理**（`arrow-lake-ctr` / `arrow-lake-ctrsmt`），所以第 15 代平台能用。
 
-用法（需要 ≥4 GB 可清空的 U 盘 + 联网）：
+> 💡 **我只用了它的「生成 EFI」这一步** —— `Create the macOS stick` 没走，
+> 生成完直接退出程序，然后去它的构建目录把 EFI 捞出来，后面照常用自己的镜像。
+
+用法：
 
 1. 解压 release，保持 `1401` 文件夹完整，**以管理员身份运行 `1401.exe`**
-2. 依次点：**Check this PC** → **Build the Mac setup** → 看 **Your BIOS steps** → **Create the macOS stick**
-3. 用 1401 的话，下面第 3、4 步可以跳过 —— U 盘和 EFI 它已经一起写好了，直接去第 5 步改 BIOS
+2. 依次点：**Check this PC** → **Build the Mac setup**（这一步就已经把 EFI 生成好了）
+3. **到这儿就可以退出程序了**
+4. 打开构建目录拿 EFI —— **`%LOCALAPPDATA%\NullMoth\1401\efi\`**
+   - 资源管理器地址栏直接粘 `%LOCALAPPDATA%\NullMoth\1401\efi` 回车即可
+   - 里面有个 **`EFI`** 文件夹（含 `EFI\OC\config.plist`、`EFI\BOOT\…`），**整个拷出来备用**
+5. 拿到 EFI 后，回到下面第 3、4 步：自己烧 macOS 镜像 → 用它替换 U 盘的 EFI
+
+> ⚠️ **不要点 `Create the macOS stick`** —— 那一步会**清空整支 U 盘并联网下载 macOS**。
+> 只想取 EFI 的话，到第 3 步退出就行，U 盘和镜像都用你自己的。
 
 #### 无论用哪个：一定要人工复核！
 
@@ -209,17 +219,17 @@ Windows 下的**一条龙工具**：检查硬件 → 生成 OpenCore → 下载 
 
 > 本仓库 `EFI/` 里就是我**复核并调通之后**的成品，可以直接对比。
 
-### 3. 烧录 macOS 镜像（用 RapidEFI 才需要）
+### 3. 烧录 macOS 镜像
 
 用 **balenaEtcher** 把 dmg 烧到 U 盘（镜像自行获取）。
 
-> 用 1401 生成的 U 盘自带 macOS 安装器，**这一步可以跳过**。
+> 只有走 1401 的 `Create the macOS stick` 才不用这步；像我一样只取 EFI 的，这步照常做。
 
-### 4. 替换 U 盘 EFI（用 RapidEFI 才需要）
+### 4. 替换 U 盘 EFI
 
-用 **DiskGenius** 打开 U 盘的 EFI 分区，用第 2 步生成的 EFI 替换掉原有的。
+用 **DiskGenius** 打开 U 盘的 EFI 分区，用第 2 步拿到的 EFI 替换掉原有的。
 
-> 1401 会连 EFI 一起写进去，**不用手动替换**。
+> 用 1401 的 `Create the macOS stick` 写盘的话，EFI 已经一起写进去了，这步跳过。
 
 ### 5. BIOS 检查
 
