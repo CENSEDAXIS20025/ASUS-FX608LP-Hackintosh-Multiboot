@@ -57,6 +57,7 @@
 ## 2. 当前关键配置
 
 - `Misc > Boot > Timeout = 5`
+- `PlatformInfo > Generic > ProcessorType = 0`（自动，不再伪装 Xeon W）
 - `Misc > Debug > Target = 67`，`AppleDebug=true`、`ApplePanic=true`（1401 要求的失败日志）
 - `Misc > Entries`：Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径
 - `Kernel > Add` 末尾：`SimpleHDA.kext`（x86_64，25.0.0–25.99.99，启用）

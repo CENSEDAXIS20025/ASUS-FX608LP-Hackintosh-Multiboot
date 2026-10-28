@@ -447,6 +447,7 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 | 项 | 值 |
 |---|---|
 | SMBIOS | `MacBookPro16,1` |
+| `ProcessorType` | `0`（自动，不再伪装 Xeon W） |
 | `csr-active-config` | `430A0000`（降级 SIP） |
 | `SecureBootModel` | `Disabled` |
 | `ResizeGpuBars` / `ResizeAppleGpuBars` | `13` / `-1` |
@@ -709,7 +710,7 @@ PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,G
 | 系统 | macOS 26.7.1（25G241） |
 | NVIDIA 驱动 | 1401 / nullmoth NVRM 2.6.2（Metal 3） |
 | SMBIOS | `MacBookPro16,1` |
-| EFI 分区 | `disk0s4`（1.1 GB FAT32） |
+| EFI 分区 | `disk1s4`（1.1 GB FAT32；编号可能随启动顺序变化） |
 | csr-active-config | `0x0A43` |
 | SecureBootModel | `Disabled` |
 
