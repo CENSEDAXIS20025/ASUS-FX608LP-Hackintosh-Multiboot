@@ -676,6 +676,24 @@
 				<key>Arch</key>
 				<string>Any</string>
 				<key>BundlePath</key>
+				<string>AsusSMC.kext</string>
+				<key>Comment</key>
+				<string>ASUS Fn keys / backlight (test)</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AsusSMC</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string></string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>Any</string>
+				<key>BundlePath</key>
 				<string>SMCBatteryManager.kext</string>
 				<key>Comment</key>
 				<string>V1.3.9</string>
@@ -1158,7 +1176,7 @@
 				<key>Auxiliary</key>
 				<false/>
 				<key>Comment</key>
-				<string>Ubuntu (disabled; add your own ESP/partition path)</string>
+				<string>Ubuntu</string>
 				<key>Enabled</key>
 				<false/>
 				<key>Flavour</key>
@@ -1166,7 +1184,7 @@
 				<key>Name</key>
 				<string>Ubuntu</string>
 				<key>Path</key>
-				<string>PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,GPT,XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,0x0,0x0)/\EFI\ubuntu\shimx64.efi</string>
+				<string>PciRoot(0x0)/Pci(0x0,0x0)/HD(1,GPT,00000000-0000-0000-0000-000000000000,0x800,0x100000)/\EFI\ubuntu\shimx64.efi</string>
 				<key>TextMode</key>
 				<false/>
 			</dict>
@@ -1254,7 +1272,7 @@
 				<key>revcpu</key>
 				<integer>1</integer>
 				<key>revcpuname</key>
-				<string>Intel Core Ultra 9 275HX</string>
+				<string>Intel(R) Core(TM) Ultra 9 275HX</string>
 				<key>revpatch</key>
 				<string>sbvmm,cpuname</string>
 				<key>rtc-blacklist</key>
@@ -1278,7 +1296,7 @@
 				AAAAAAAAAAAAAAAAAAA=
 				</data>
 				<key>boot-args</key>
-				<string>-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 revpatch=sbvmm,cpuname</string>
+				<string>-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1</string>
 				<key>csr-active-config</key>
 				<data>
 				QwoAAA==
@@ -1359,7 +1377,7 @@
 			<key>MaxBIOSVersion</key>
 			<false/>
 			<key>ProcessorType</key>
-			<integer>0</integer>
+			<integer>3841</integer>
 			<key>ROM</key>
 			<data>
 			AAAAAAAA

@@ -62,7 +62,7 @@
    已替换为占位符。请在 OCAT / GenSMBIOS 里生成一套你自己的，不要直接使用占位符；
    多台机器共用同一套会导致 iCloud / iMessage 被锁。
 2. **改 BIOS**：关 Secure Boot、关 VT-d、开 Resizable BAR、开 Above 4G、开独显直连。
-3. **确认 macOS 版本**：这份 `EFI/` 原始配置对应 **macOS 15.7.8**；macOS 26 的当前配置、1401 2.6.2 和触控板补丁见根目录 README 第十二节 / 0.1。
+3. **确认 macOS 版本**：这份 `EFI/` 原始配置对应 **macOS 15.7.8**；macOS 26 完整 EFI 见 `macos26/EFI/`，当前配置和触控板补丁见根目录 README 第十二节 / 0.1。
 4. 先在小容量 U 盘上试，别一上来就动主硬盘。
 
 ## 关于备份文件

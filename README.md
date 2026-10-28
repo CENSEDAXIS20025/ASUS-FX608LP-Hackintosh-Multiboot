@@ -293,7 +293,7 @@ Windows 下的开源工具：检查硬件 → 生成 OpenCore →（可选）下
 - `boot-args` →
 
 ```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
 ```
 
 **UEFI → Quirks**
@@ -447,9 +447,9 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 | 项 | 值 |
 |---|---|
 | SMBIOS | `MacBookPro16,1` |
-| `ProcessorType` | `0`（自动） |
-| `revpatch` | `sbvmm,cpuname` |
-| `revcpu` / `revcpuname` | `1` / `Intel Core Ultra 9 275HX`（RestrictEvents 1.1.7） |
+| `ProcessorType` | `3841`（本机可用；不要设 0） |
+| `revpatch` | 不使用 `cpuname`（会卡启动） |
+| `revcpuname` | 可保留，但不要启用 `cpuname` |
 | `csr-active-config` | `430A0000`（降级 SIP） |
 | `SecureBootModel` | `Disabled` |
 | `ResizeGpuBars` / `ResizeAppleGpuBars` | `13` / `-1` |
@@ -549,7 +549,8 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 |---|---|
 | `README.md` | 本文档（安装教程） |
 | `安装Windows+其他多系统.txt` | 我最初的原始笔记（未整理版） |
-| `EFI/` | 调通的 OpenCore EFI（可直接对比参考） |
+| `EFI/` | macOS 15 调通的 OpenCore EFI |
+| `macos26/EFI/` | macOS 26 当前可用 EFI（已脱敏） |
 | `USB定制/` | USB 端口数据（`usb.json`）与 `USBMap.kext` |
 | `session-log/` | 原始对话日志含唯一标识，**已于 2026-10-28 移除** |
 
@@ -557,6 +558,10 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 
 <a name="sec12"></a>
 ## 十二、macOS 26（Tahoe）迁移记录
+
+> **2026-10-28 CPU 识别修正**：此前把 `ProcessorType` 设为 0、并在 `revpatch` 里加 `cpuname` 的做法是**错误步骤**，会导致 macOS 26 在 OC FileVault 密码后卡死。正确配置是 `ProcessorType=3841`，boot-args 不含 `cpuname`；CPU 型号在 01:35 EFI 上识别正常。触控板/AsusSMC 与 CPU 无关。
+
+> **macOS 26 完整 EFI** 已上传到 `macos26/EFI/`；仓库根目录的 `EFI/` 仍是 macOS 15 版。
 
 > 这一节是**升级到 macOS 26 之后**的排障记录。
 > **上面的 `EFI/` 是 macOS 15 的**，到 macOS 26 有几处必须重做。
@@ -639,17 +644,17 @@ PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,G
 | `DisableIoMapper` | `true` |
 | `DisableRtcChecksum` | `true` |
 | `ACPI → Delete` | `DMAR`，`All=true`、`Enabled=true` |
-| `Kernel → Add` | `AsusSMC.kext`（1.4.1，测试 Fn/背光）|
+| `Kernel → Add` | `AsusSMC.kext`（1.4.1，已启用；键盘背光不支持）|
 | `Misc → Boot → Timeout` | `5` |
-| `Misc → Debug → Target` | `67`（AppleDebug/ApplePanic=true）|
-| `Misc → Entries` | Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径 |
+| `Misc → Debug → Target` | `0` |
+| `Misc → Entries` | 仓库副本置为占位/禁用；本机使用时换成自己的路径 |
 | `Kernel → Add` 末尾 | `SimpleHDA.kext`（25.0.0–25.99.99）|
 | 已禁用 | `itlwm` · `UTBDefault` · `SMCSuperIO` |
 
 **`boot-args`（macOS 26 当前）**：
 
 ```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
 ```
 
 > 注意：**没有 `-v`**（不再跑码），**没有 `-wegnoegpu`**（不能禁 N 卡）。
@@ -882,7 +887,7 @@ EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 -vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth
 amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4
 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
--ibtcompatbeta revpatch=sbvmm,cpuname
+-ibtcompatbeta revpatch=sbvmm
 ```
 
 说明：

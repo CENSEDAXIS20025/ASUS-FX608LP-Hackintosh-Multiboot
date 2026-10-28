@@ -1,8 +1,12 @@
+> **2026-10-28 CPU 识别修正**：此前把 `ProcessorType` 设为 0、并在 `revpatch` 里加 `cpuname` 的做法是**错误步骤**，会导致 macOS 26 在 OC FileVault 密码后卡死。正确配置是 `ProcessorType=3841`，boot-args 不含 `cpuname`；CPU 型号在 01:35 EFI 上识别正常。触控板/AsusSMC 与 CPU 无关。
+
+> **macOS 26 完整 EFI** 已上传到本目录的 `EFI/`；仓库根目录的 `EFI/` 仍是 macOS 15 版。
+
 > **归档说明**：这里是原始导出的**精简版**。原始导出共 257 文件 / 272.87 MB，
 > 其中 `EFI/`（80 MB 快照）、`artifacts/packages/`（26 MB 安装包）、`previous/`（106 MB 旧归档）
 > **没有重复上传**。
 > 本目录收录：**报告 + 取证材料 + 脚本 + 当前 config + 会话日志**。
-> 完整 EFI 见仓库根目录的 `EFI/`（那是 **macOS 15** 版；macOS 26 版未上传）。
+> macOS 15 完整 EFI 见仓库根目录的 `EFI/`；macOS 26 完整 EFI 见本目录的 `EFI/`。
 
 ---
 
@@ -57,16 +61,16 @@
 ## 2. 当前关键配置
 
 - `Misc > Boot > Timeout = 5`
-- `PlatformInfo > Generic > ProcessorType = 0`（自动）
-- `revpatch = sbvmm,cpuname`
-- `revcpu = 1`，`revcpuname = Intel Core Ultra 9 275HX`（RestrictEvents）
-- `Misc > Debug > Target = 67`，`AppleDebug=true`、`ApplePanic=true`（1401 要求的失败日志）
-- `Misc > Entries`：Ubuntu 项 **已禁用/占位**，请换成你自己的分区路径
+- `PlatformInfo > Generic > ProcessorType = 3841`
+- CPU 名称：不要使用 `revpatch=...,cpuname` / `ProcessorType=0`（会导致 OC 密码后卡死）
+- `revcpuname` 可保留，但**不要启用** `cpuname`
+- `Misc > Debug > Target = 0`
+- `Misc > Entries`：仓库副本已置为占位/禁用；本机使用时换成你自己的分区路径
 - `Kernel > Add` 末尾：`SimpleHDA.kext`（x86_64，25.0.0–25.99.99，启用）
-- `Kernel > Add`：`AsusSMC.kext` 1.4.1（测试 Fn/背光；`IsKeyboardBacklightSupported=No`）
+- `Kernel > Add`：`AsusSMC.kext` 1.4.1（已启用；键盘背光不支持）
 - `itlwm.kext` 禁用；`UTBDefault.kext` 禁用；`SMCSuperIO.kext` 禁用
 - 当前 `boot-args`：
-  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname`
+  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1`
 - **没有** `-wegnoegpu`；N 卡未被禁用。
 
 ## 3. 驱动版本
