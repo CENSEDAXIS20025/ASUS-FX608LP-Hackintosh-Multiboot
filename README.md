@@ -293,7 +293,7 @@ Windows 下的开源工具：检查硬件 → 生成 OpenCore →（可选）下
 - `boot-args` →
 
 ```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname -ibtcompatbeta revpatch=sbvmm,cpuname
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname
 ```
 
 **UEFI → Quirks**
