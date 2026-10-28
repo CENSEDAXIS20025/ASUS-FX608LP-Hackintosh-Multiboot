@@ -1260,7 +1260,7 @@
 				AAAAAAAAAAAAAAAAAAA=
 				</data>
 				<key>boot-args</key>
-				<string>-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 -v keepsyms=1 alcid=13 revpatch=sbvmm,cpuname</string>
+				<string>-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 -v keepsyms=1 alcid=13 revpatch=sbvmm</string>
 				<key>csr-active-config</key>
 				<data>
 				QwoAAA==
@@ -1341,7 +1341,7 @@
 			<key>MaxBIOSVersion</key>
 			<false/>
 			<key>ProcessorType</key>
-			<integer>0</integer>
+			<integer>3841</integer>
 			<key>ROM</key>
 			<data>
 			AAAAAAAA
