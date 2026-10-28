@@ -447,7 +447,9 @@ USB定制/             usb.json（端口数据）· settings.json · USBMap.kext
 | 项 | 值 |
 |---|---|
 | SMBIOS | `MacBookPro16,1` |
-| `ProcessorType` | `0`（自动，不再伪装 Xeon W） |
+| `ProcessorType` | `0`（自动） |
+| `revpatch` | `sbvmm,cpuname` |
+| `revcpu` / `revcpuname` | `1` / `Intel Core Ultra 9 275HX`（RestrictEvents 1.1.7） |
 | `csr-active-config` | `430A0000`（降级 SIP） |
 | `SecureBootModel` | `Disabled` |
 | `ResizeGpuBars` / `ResizeAppleGpuBars` | `13` / `-1` |
