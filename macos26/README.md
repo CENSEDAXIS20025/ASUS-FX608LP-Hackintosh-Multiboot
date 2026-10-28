@@ -3,9 +3,8 @@
 > **macOS 26 完整 EFI** 已上传到本目录的 `EFI/`；仓库根目录的 `EFI/` 仍是 macOS 15 版。
 
 > **归档说明**：这里是原始导出的**精简版**。原始导出共 257 文件 / 272.87 MB，
-> 其中 `EFI/`（80 MB 快照）、`artifacts/packages/`（26 MB 安装包）、`previous/`（106 MB 旧归档）
-> **没有重复上传**。
-> 本目录收录：**报告 + 取证材料 + 脚本 + 当前 config + 会话日志**。
+> 其中 `artifacts/packages/`（26 MB 安装包）和 `previous/`（106 MB 旧归档）没有重复上传；**macOS 26 的 `EFI/` 已上传到本目录。**
+> 本目录收录：**报告 + 取证材料 + 脚本 + 当前 config + 会话日志 + macOS 26 EFI**。
 > macOS 15 完整 EFI 见仓库根目录的 `EFI/`；macOS 26 完整 EFI 见本目录的 `EFI/`。
 
 ---
