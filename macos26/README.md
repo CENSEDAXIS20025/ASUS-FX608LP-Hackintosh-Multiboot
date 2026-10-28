@@ -66,7 +66,7 @@
 - `Kernel > Add`：`AsusSMC.kext` 1.4.1（测试 Fn/背光；`IsKeyboardBacklightSupported=No`）
 - `itlwm.kext` 禁用；`UTBDefault.kext` 禁用；`SMCSuperIO.kext` 禁用
 - 当前 `boot-args`：
-  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm`
+  `-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname`
 - **没有** `-wegnoegpu`；N 卡未被禁用。
 
 ## 3. 驱动版本

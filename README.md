@@ -293,7 +293,7 @@ Windows 下的开源工具：检查硬件 → 生成 OpenCore →（可选）下
 - `boot-args` →
 
 ```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm -ibtcompatbeta revpatch=sbvmm
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname -ibtcompatbeta revpatch=sbvmm,cpuname
 ```
 
 **UEFI → Quirks**
@@ -649,7 +649,7 @@ PciRoot(0x1)/Pci(0x1D,0x0)/Pci(0x0,0x0)/NVMe(0x1,XX-XX-XX-XX-XX-XX-XX-XX)/HD(4,G
 **`boot-args`（macOS 26 当前）**：
 
 ```
--vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm
+-vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1 -ibtcompatbeta revpatch=sbvmm,cpuname
 ```
 
 > 注意：**没有 `-v`**（不再跑码），**没有 `-wegnoegpu`**（不能禁 N 卡）。
@@ -882,7 +882,7 @@ EFI/OC/Kexts/VoodooI2CHID.kext.bak-hidpolling-*
 -vi2c-force-polling nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth
 amfi_get_out_of_my_way=0x1 amfi=0x80 ipc_control_port_options=0 gfxrst=4
 -gux_defer_usb2 alcid=13 itlwm_he=1 keepsyms=1
--ibtcompatbeta revpatch=sbvmm
+-ibtcompatbeta revpatch=sbvmm,cpuname
 ```
 
 说明：
